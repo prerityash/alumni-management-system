@@ -2,118 +2,332 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Alumni Dashboard</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alumni Minimal Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background-color: rgb(199, 199, 199);
-}
+  * { box-sizing: border-box; }
 
-/* NAVBAR */
-.navbar {
-  height: 60px;
-  background: #111;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-}
+  body {
+    margin: 0;
+    font-family: 'Outfit', Arial, sans-serif;
+    background: #f4f6f8;
+    color: #333333;
+    overflow: hidden;
+  }
 
-.logo {
-  font-weight: bold;
-}
+  /* NAVBAR */
+  .navbar {
+    height: 70px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
 
-.profile-btn {
-  background: #111;
-  color: white;
-  border: 1px solid white;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: 0.3s;
-}
+  .logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #0f172a;
+  }
 
-.profile-btn:hover {
-  background: white;
-  color: black;
-}
+  /* SVG Avatar for Profile */
+  .profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .profile-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  }
 
-/* LAYOUT */
-.container {
-  display: flex;
-  height: calc(100vh - 60px);
-}
+  /* LAYOUT */
+  .container {
+    display: flex;
+    height: calc(100vh - 70px);
+  }
 
-/* SIDEBAR */
-.sidebar {
-  width: 20%;
-  background: #f2f2f2;
-  display: flex;
-  flex-direction: column;
-  padding: 15px;
-}
+  /* SIDEBAR */
+  .sidebar {
+    width: 250px;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-.sidebar button {
-  margin: 8px 0;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  background: white;
-  text-align: left;
-}
+  .sidebar button {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Outfit', Arial, sans-serif;
+  }
 
-.sidebar button:hover {
-  background: black;
-  color: white;
-}
+  .sidebar button:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+  
+  .sidebar button.active {
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+  }
 
-/* CONTENT */
-.content {
-  width: 80%;
-  padding: 25px;
-}
+  /* MAIN CONTENT */
+  .content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
 
-/* TOP WELCOME SECTION */
-.welcome-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-}
+  /* GREETING SECTION */
+  .greeting-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
 
-/* LEFT GREETING */
-.welcome-text {
-  display: flex;
-  flex-direction: column;
-}
+  .greeting-left h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #0f172a;
+  }
+  .greeting-left p {
+    margin: 5px 0 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
 
-.welcome-main {
-  font-size: 32px;
-  font-weight: bold;
-}
+  .greeting-right {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .greeting-right strong {
+    color: #334155;
+  }
 
-.welcome-sub {
-  color: gray;
-  margin-top: 5px;
-}
+  /* GRID SYSTEM */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(min-content, max-content);
+    gap: 20px;
+  }
 
-/* RIGHT COLLEGE INFO */
-.college-info {
-  text-align: right;
-}
+  /* CARDS */
+  .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
 
-.course {
-  font-weight: bold;
-}
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
 
-.university {
-  color: gray;
-  margin-top: 5px;
-}
+  .card h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .live-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+  }
+
+  /* GRID SIZING CLASSES */
+  .col-3 { grid-column: span 3; }
+  .col-4 { grid-column: span 4; }
+  .col-5 { grid-column: span 5; }
+  .col-8 { grid-column: span 8; }
+  .col-12 { grid-column: span 12; }
+
+  /* SPECIFIC COMPONENT STYLES */
+  
+  /* Total Alumni */
+  .alumni-count-card {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .alumni-count-card h1 {
+    margin: 0;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #3b82f6;
+  }
+
+  /* Quick Actions */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+  }
+  .actions button {
+    flex: 1 1 calc(33% - 15px);
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+    font-family: 'Outfit', Arial, sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .actions button:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+  }
+
+  /* Forms Global */
+  input, select {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-family: 'Outfit', Arial, sans-serif;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  input::placeholder { color: #94a3b8; }
+  input:focus, select:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+  }
+
+  /* Horizontal Job Form */
+  .job-form-container {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    align-items: flex-end;
+  }
+  .job-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .job-form-group label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  /* Vertical Internship Form */
+  .intern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Buttons */
+  .post-btn {
+    background: #3b82f6;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Outfit', Arial, sans-serif;
+    height: 44px; /* Match input heights */
+  }
+  .post-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  }
+
+  /* Lists (Notifications, Events, Feedbacks) */
+  .list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .list-item {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    border: 1px solid #e2e8f0;
+    border-left-width: 4px;
+  }
+  .list-item.new { border-left-color: #3b82f6; }
+  .list-item.event { border-left-color: #f59e0b; }
+  .list-item.feedback { border-left-color: #8b5cf6; }
+  .list-item p { margin: 0; font-size: 0.95rem; color: #1e293b; }
+  .list-item span { font-size: 0.8rem; color: #64748b; }
+
+  /* RESPONSIVE STYLES */
+  @media (max-width: 1200px) {
+    .col-3, .col-4, .col-5, .col-8 { grid-column: span 6; }
+    .job-form-container { flex-wrap: wrap; }
+    .job-form-container .job-form-group { flex: 1 1 30%; }
+    .job-form-container .post-btn { width: 100%; }
+  }
+  @media (max-width: 768px) {
+    .container { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
+    .col-3, .col-4, .col-5, .col-8, .col-12 { grid-column: span 12; }
+    .job-form-container .job-form-group { flex: 1 1 100%; }
+    .greeting-section { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .greeting-right { text-align: left; }
+  }
 </style>
 </head>
 
@@ -121,11 +335,14 @@ body {
 
 <!-- NAVBAR -->
 <div class="navbar">
-  <div class="logo">Alumni Portal</div>
-
-  <button class="profile-btn" onclick="openProfile()">
-    Profile
-  </button>
+  <div class="logo">AlumniPortal Pro</div>
+  
+  <div class="profile-avatar" onclick="window.location.href='profile.html'" title="My Profile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  </div>
 </div>
 
 <!-- MAIN -->
@@ -133,87 +350,254 @@ body {
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <button onclick="showSection('dashboard')">Dashboard</button>
-    <button onclick="showSection('connect')">Connect Hub</button>
-    <button onclick="showSection('jobs')">Job Portal</button>
-    <button onclick="showSection('meetup')">Alumni Meetup</button>
-    <button onclick="logout()">Logout</button>
+    <button class="active">Dashboard</button>
+    <button>Find Alumni</button>
+    <button>Jobs</button>
+    <button>Events</button>
+    <button onclick="logout()" style="margin-top: auto; color: #ef4444;">Logout</button>
   </div>
 
   <!-- CONTENT -->
   <div class="content">
 
-    <!-- WELCOME SECTION -->
-    <div class="welcome-box">
+    <!-- GREETING SECTION -->
+    <div class="greeting-section">
+      <div class="greeting-left">
+        <h2 id="greetingMsg">Good Morning, Guest</h2>
+        <p>Welcome back to your comprehensive minimal dashboard.</p>
+      </div>
+      <div class="greeting-right">
+        <strong>CSE | Full Stack Web Development</strong><br/>
+        Lovely Professional University, Punjab
+      </div>
+    </div>
 
-      <!-- LEFT -->
-      <div class="welcome-text">
-        <div class="welcome-main" id="welcome"></div>
-        <div class="welcome-sub">Glad to have you back</div>
+    <div class="grid">
+
+      <!-- TOTAL ALUMNI (Col-3) -->
+      <div class="card col-3 alumni-count-card">
+        <h3>Total Alumni <span class="live-indicator" style="background:#3b82f6;" title="Verified Users"></span></h3>
+        <h1 id="alumniCount">0</h1>
+        <p style="color: #94a3b8; font-size: 0.85rem; margin: 10px 0 0 0;">Connected Platform</p>
       </div>
 
-      <!-- RIGHT -->
-      <div class="college-info">
-        <div class="course">CSE | Full Stack Web Development</div>
-        <div class="university">Lovely Professional University, Punjab</div>
+      <!-- QUICK ACTIONS (Col-5) -->
+      <div class="card col-5">
+        <h3>Quick Actions</h3>
+        <div class="actions">
+          <button>🔍 Find Alumni</button>
+          <button>📅 Register Event</button>
+          <button>💼 View Jobs</button>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS (Col-4) -->
+      <div class="card col-4">
+        <h3>Job Notifications <span class="live-indicator"></span></h3>
+        <div class="list-wrapper" id="notificationsList">
+          <div class="list-item">
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- JOB FORM (Col-12 Horizontal) -->
+      <div class="card col-12">
+        <h3>Post a New Job</h3>
+        <div class="job-form-container">
+          <div class="job-form-group">
+            <label>Title</label>
+            <input type="text" id="jobTitle" placeholder="e.g. Frontend Developer">
+          </div>
+          <div class="job-form-group">
+            <label>Type</label>
+            <select id="jobType">
+              <option value="remote">Remote</option>
+              <option value="onsite">Onsite</option>
+              <option value="hybrid">Hybrid</option>
+            </select>
+          </div>
+          <div class="job-form-group">
+            <label>Location</label>
+            <input type="text" id="jobLocation" placeholder="e.g. New York, NY">
+          </div>
+          <div class="job-form-group">
+            <label>Vacancy</label>
+            <input type="number" id="jobVacancy" placeholder="e.g. 3">
+          </div>
+          <div class="job-form-group">
+            <label>Register Link</label>
+            <input type="url" id="jobLink" placeholder="https://...">
+          </div>
+          <button class="post-btn" id="postJobBtn">Post Job</button>
+        </div>
+      </div>
+
+      <!-- INTERNSHIP FORM (Col-4 Vertical) -->
+      <div class="card col-4">
+        <h3>Post Internship</h3>
+        <div class="intern-form">
+          <input type="text" id="internTitle" placeholder="Internship Title">
+          <select id="internType">
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+          </select>
+          <input type="text" id="internLocation" placeholder="Location">
+          <input type="text" id="internStipend" placeholder="Stipend (e.g. $1000/mo)">
+          <input type="url" id="internLink" placeholder="Application Link">
+          <button class="post-btn" id="postInternBtn">Post Internship</button>
+        </div>
+      </div>
+
+      <!-- EVENTS (Col-4) -->
+      <div class="card col-4">
+        <h3>Upcoming Events <span class="live-indicator" style="background:#f59e0b;"></span></h3>
+        <div class="list-wrapper">
+          <div class="list-item event">
+            <p><strong>Tech Meetup 2026</strong></p>
+            <span>Aug 15 • San Francisco, CA</span>
+          </div>
+          <div class="list-item event">
+            <p><strong>Alumni Career Fair</strong></p>
+            <span>Sep 10 • Virtual</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK (Col-4) -->
+      <div class="card col-4">
+        <h3>Feedbacks Received</h3>
+        <div class="list-wrapper">
+          <div class="list-item feedback">
+            <p>"Great networking event last Friday!"</p>
+            <span>- Alex J. (Class of '22)</span>
+          </div>
+          <div class="list-item feedback">
+            <p>"The new job portal layout is very clean."</p>
+            <span>- Maria S. (Class of '24)</span>
+          </div>
+        </div>
       </div>
 
     </div>
-
-    <!-- DYNAMIC SECTION -->
-    <div id="mainSection" style="margin-top:20px;"></div>
 
   </div>
 </div>
 
 <script>
-const name = localStorage.getItem("name");
-
-document.getElementById("welcome").innerText =
-  `Welcome, ${name || "User"}`;
-
-/* DEFAULT DASHBOARD CONTENT */
-function loadDashboard() {
-  document.getElementById("mainSection").innerHTML =
-    "<h3>Dashboard Overview</h3><p>Welcome to your alumni dashboard.</p>";
+// Greeting Logic
+function updateGreeting() {
+  const userName = localStorage.getItem("name") || "Alumni";
+  const hour = new Date().getHours();
+  let greeting = "Good Evening";
+  
+  if (hour < 12) greeting = "Good Morning";
+  else if (hour < 18) greeting = "Good Afternoon";
+  
+  document.getElementById("greetingMsg").innerText = `${greeting}, ${userName}!`;
 }
+updateGreeting();
 
-/* SIDEBAR NAV */
-function showSection(section) {
-
-  if (section === "dashboard") {
-    loadDashboard();
-  }
-
-  else if (section === "connect") {
-    document.getElementById("mainSection").innerHTML =
-      "<h3>Connect Hub</h3><p>Networking section coming soon.</p>";
-  }
-
-  else if (section === "jobs") {
-    document.getElementById("mainSection").innerHTML =
-      "<h3>Job Portal</h3><p>Job listings coming soon.</p>";
-  }
-
-  else if (section === "meetup") {
-    document.getElementById("mainSection").innerHTML =
-      "<h3>Alumni Meetup</h3><p>Events coming soon.</p>";
-  }
-}
-
-/* PROFILE */
-function openProfile() {
-  alert("Profile page coming later");
-}
-
-/* LOGOUT */
+// Keep existing logout functionality
 function logout() {
   localStorage.clear();
   window.location.href = "../auth.html";
 }
 
-/* DEFAULT LOAD */
-loadDashboard();
+const BASE_URL = "http://localhost:5000/api";
+const userId = localStorage.getItem("userId") || null;
+
+// Fetch Real Alumni Count
+async function fetchAlumniCount() {
+  try {
+    const res = await fetch(`${BASE_URL}/users/stats`);
+    const data = await res.json();
+    if(data.totalAlumni !== undefined) {
+      document.getElementById('alumniCount').innerText = data.totalAlumni.toLocaleString();
+    }
+  } catch (err) {
+    console.error("Error fetching alumni stats:", err);
+  }
+}
+
+// Fetch Posts and populate Notifications
+async function fetchPosts() {
+  try {
+    const res = await fetch(`${BASE_URL}/posts`);
+    const posts = await res.json();
+    const notificationsList = document.getElementById("notificationsList");
+    notificationsList.innerHTML = "";
+
+    posts.forEach(post => {
+      // Create HTML depending on postType
+      const div = document.createElement("div");
+      div.className = "list-item new";
+      
+      const title = post.title || "Untitled";
+      const location = post.location || post.company || "Unknown";
+      const type = post.postType === "internship" ? "Internship" : (post.postType === "job" ? "Job" : "General");
+
+      div.innerHTML = `
+        <p><strong>${title} (${type})</strong></p>
+        <span>Location: ${location}</span>
+      `;
+      notificationsList.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+  }
+}
+
+document.getElementById("postJobBtn").onclick = async () => {
+  const payload = {
+    title: document.getElementById("jobTitle").value,
+    postType: "job",
+    type: document.getElementById("jobType").value,
+    location: document.getElementById("jobLocation").value,
+    vacancy: Number(document.getElementById("jobVacancy").value),
+    link: document.getElementById("jobLink").value,
+    postedBy: userId
+  };
+
+  try {
+    await fetch(`${BASE_URL}/posts/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    alert("Job posted successfully!");
+    fetchPosts(); // refresh list
+  } catch(e) { alert("Error posting job"); }
+};
+
+document.getElementById("postInternBtn").onclick = async () => {
+  const payload = {
+    title: document.getElementById("internTitle").value,
+    postType: "internship",
+    type: document.getElementById("internType").value,
+    location: document.getElementById("internLocation").value,
+    stipend: document.getElementById("internStipend").value,
+    link: document.getElementById("internLink").value,
+    postedBy: userId
+  };
+
+  try {
+    await fetch(`${BASE_URL}/posts/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    alert("Internship posted successfully!");
+    fetchPosts(); // refresh list
+  } catch(e) { alert("Error posting internship"); }
+};
+
+// Initial calls
+fetchAlumniCount();
+fetchPosts();
+// Poll every certain interval for live-feel
+setInterval(fetchAlumniCount, 15000);
+setInterval(fetchPosts, 15000);
 </script>
 
 </body>

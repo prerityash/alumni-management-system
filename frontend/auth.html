@@ -2,76 +2,127 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Auth</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlumniPortal Pro - Authentication</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #f4f4f4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+  body {
+    margin: 0;
+    font-family: 'Outfit', Arial, sans-serif;
+    background: #f4f6f8;
+    color: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-/* Modal */
-.modal {
-  background: white;
-  padding: 25px;
-  width: 320px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-}
+  /* Modal */
+  .modal {
+    background: #ffffff;
+    padding: 40px;
+    width: 380px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+    animation: fadeIn 0.6s ease-out;
+  }
 
-/* Tabs */
-.tabs {
-  display: flex;
-  margin-bottom: 15px;
-}
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-.tabs button {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  background: #ddd;
-}
+  h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    color: #0f172a;
+  }
 
-.tabs button.active {
-  background: black;
-  color: white;
-}
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
 
-/* Inputs */
-input {
-  width: 100%;
-  margin: 6px 0;
-  padding: 8px;
-}
+  .tabs button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: transparent;
+    color: #64748b;
+    font-family: 'Outfit', Arial, sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
 
-/* Button */
-button.submit {
-  width: 100%;
-  padding: 10px;
-  background: black;
-  color: white;
-  border: none;
-  margin-top: 10px;
-  cursor: pointer;
-}
+  .tabs button.active {
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+  }
 
-/* Hide */
-.hidden {
-  display: none;
-}
+  /* Inputs */
+  input {
+    width: 100%;
+    margin: 8px 0;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    border-radius: 10px;
+    font-family: 'Outfit', Arial, sans-serif;
+    outline: none;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+  }
+  
+  input::placeholder { color: #94a3b8; }
+  input:focus { 
+    border-color: #3b82f6; 
+    background: #ffffff;
+  }
+
+  /* Button */
+  button.submit {
+    width: 100%;
+    padding: 14px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-family: 'Outfit', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  button.submit:hover {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    transform: translateY(-2px);
+  }
+
+  /* Hide */
+  .hidden {
+    display: none;
+  }
 </style>
 </head>
 
 <body>
 
 <div class="modal">
-
+  <h2>AlumniPortal Pro</h2>
   <div class="tabs">
     <button id="loginTab" class="active">Login</button>
     <button id="signupTab">Signup</button>
@@ -81,17 +132,17 @@ button.submit {
   <div id="loginForm">
     <input id="loginId" placeholder="College ID">
     <input id="loginPass" type="password" placeholder="Password">
-    <button class="submit" onclick="login()">Login</button>
+    <button class="submit" onclick="login()">Access Portal</button>
   </div>
 
   <!-- SIGNUP -->
   <div id="signupForm" class="hidden">
-    <input id="name" placeholder="Name">
+    <input id="name" placeholder="Full Name">
     <input id="collegeId" placeholder="College ID">
     <input id="email" placeholder="College Email">
-    <input id="year" placeholder="Graduation Year">
+    <input id="year" type="number" placeholder="Graduation Year (e.g. 2024)">
     <input id="password" type="password" placeholder="Password">
-    <button class="submit" onclick="signup()">Signup</button>
+    <button class="submit" onclick="signup()">Create Account</button>
   </div>
 
 </div>
@@ -102,7 +153,6 @@ const BASE_URL = "http://localhost:5000/api/users";
 /* TAB SWITCH */
 const loginTab = document.getElementById("loginTab");
 const signupTab = document.getElementById("signupTab");
-
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 
@@ -123,60 +173,63 @@ signupTab.onclick = () => {
 /* SIGNUP */
 window.signup = async () => {
   const data = {
-    name: document.getElementById("name").value, //due to inbrowser conflict we written this way instaed of directly accessing value in object
-    collegeId: collegeId.value,
-    email: email.value,
-    graduationYear: Number(year.value),
-    password: password.value
+    name: document.getElementById("name").value,
+    collegeId: document.getElementById("collegeId").value,
+    email: document.getElementById("email").value,
+    graduationYear: Number(document.getElementById("year").value),
+    password: document.getElementById("password").value
   };
 
-  const res = await fetch(`${BASE_URL}/register`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(data)
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/register`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
 
-  const result = await res.json();
-  alert(result.message || result.error);
+    const result = await res.json();
+    alert(result.message || result.error);
 
-  // switch to login after signup
-  loginTab.click();
+    if(!result.error) {
+      loginTab.click();
+    }
+  } catch (err) {
+    alert("Network error. Is backend running?");
+  }
 };
-
 
 /* LOGIN */
 window.login = async () => {
   const data = {
-    collegeId: loginId.value,
-    password: loginPass.value
+    collegeId: document.getElementById("loginId").value,
+    password: document.getElementById("loginPass").value
   };
 
-  const res = await fetch(`${BASE_URL}/login`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(data)
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/login`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
 
-  const result = await res.json();
+    const result = await res.json();
 
-  if (result.error) {
-    alert(result.error);
-    return;
-  }
+    if (result.error) {
+      alert(result.error);
+      return;
+    }
 
     if (result.role) {
         localStorage.setItem("role", result.role);
         localStorage.setItem("name", result.name);
+        localStorage.setItem("userId", result.userId);
+        
+        // redirect to index.html which routes according to role
         window.location.href = "index.html";
-}
-
-    localStorage.setItem("role", result.role);
-    localStorage.setItem("name", result.name);
-    localStorage.setItem("userId", result.userId);
-
-
-  // redirect to home page
-  window.location.href = "index.html";
+    }
+  } catch (err) {
+    alert("Network error. Is backend running?");
+  }
 };
 </script>
 
