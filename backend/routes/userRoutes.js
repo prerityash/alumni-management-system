@@ -9,6 +9,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 // SIGNUP
 router.post("/register", async (req, res) => {
   try {
+    console.log("BODY RECEIVED:", req.body);
     const { name, collegeId, email, password, graduationYear } = req.body;
 
     // role logic
@@ -35,30 +36,21 @@ router.post("/register", async (req, res) => {
 
 // LOGIN
 router.post("/login", async (req, res) => {
-  try {
-    const { collegeId, password } = req.body;
+  const { collegeId, password } = req.body;
 
-    // ADMIN LOGIN (hardcoded)
-    if (collegeId === "admin" && password === "admin123") {
-      return res.json({ role: "admin" });
-    }
+  const user = await User.findOne({ collegeId });
 
-    const user = await User.findOne({ collegeId });
+  if (!user) return res.status(400).json({ error: "User not found" });
 
-    if (!user) return res.status(400).json({ error: "User not found" });
+  const match = await bcrypt.compare(password, user.password);
 
-    const isMatch = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(400).json({ error: "Invalid password" });
 
-    if (!isMatch) return res.status(400).json({ error: "Invalid password" });
-
-    res.json({
-      role: user.role,
-      userId: user._id
-    });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  res.json({
+    role: user.role,
+    name: user.name,
+    userId: user._id
+  });
 });
 
 export default router;
