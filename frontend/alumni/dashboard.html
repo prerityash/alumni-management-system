@@ -1,604 +1,821 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alumni Minimal Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-  * { box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Minimal Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-  body {
-    margin: 0;
-    font-family: 'Outfit', Arial, sans-serif;
-    background: #f4f6f8;
-    color: #333333;
-    overflow: hidden;
-  }
+    body {
+      margin: 0;
+      font-family: 'Outfit', Arial, sans-serif;
+      background: #f4f6f8;
+      color: #333333;
+      overflow: hidden;
+    }
 
-  /* NAVBAR */
-  .navbar {
-    height: 70px;
-    background: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 40px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+    /* NAVBAR */
+    .navbar {
+      height: 70px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-  .logo {
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: #0f172a;
-  }
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #0f172a;
+    }
 
-  /* SVG Avatar for Profile */
-  .profile-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .profile-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-  }
+    /* SVG Avatar for Profile */
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-  /* LAYOUT */
-  .container {
-    display: flex;
-    height: calc(100vh - 70px);
-  }
+    .profile-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
 
-  /* SIDEBAR */
-  .sidebar {
-    width: 250px;
-    background: #ffffff;
-    border-right: 1px solid #e2e8f0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+    /* LAYOUT */
+    .container {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
 
-  .sidebar button {
-    padding: 12px 20px;
-    border: none;
-    background: transparent;
-    color: #64748b;
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: left;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Outfit', Arial, sans-serif;
-  }
+    /* SIDEBAR */
+    .sidebar {
+      width: 250px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-  .sidebar button:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-  }
-  
-  .sidebar button.active {
-    background: #3b82f6;
-    color: white;
-    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
-  }
+    .sidebar button {
+      padding: 12px 20px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Outfit', Arial, sans-serif;
+    }
 
-  /* MAIN CONTENT */
-  .content {
-    flex: 1;
-    padding: 30px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
-  }
+    .sidebar button:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
 
-  /* GREETING SECTION */
-  .greeting-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #ffffff;
-    padding: 25px 30px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 25px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
+    .sidebar button.active {
+      background: #3b82f6;
+      color: white;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+    }
 
-  .greeting-left h2 {
-    margin: 0;
-    font-size: 1.8rem;
-    color: #0f172a;
-  }
-  .greeting-left p {
-    margin: 5px 0 0 0;
-    color: #64748b;
-    font-size: 0.95rem;
-  }
+    /* MAIN CONTENT */
+    .content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+    }
 
-  .greeting-right {
-    text-align: right;
-    font-size: 0.85rem;
-    color: #64748b;
-    line-height: 1.5;
-  }
-  .greeting-right strong {
-    color: #334155;
-  }
+    /* GREETING SECTION */
+    .greeting-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      padding: 25px 30px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 25px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
 
-  /* GRID SYSTEM */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-auto-rows: minmax(min-content, max-content);
-    gap: 20px;
-  }
+    .greeting-left h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #0f172a;
+    }
 
-  /* CARDS */
-  .card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-  }
+    .greeting-left p {
+      margin: 5px 0 0 0;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
 
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  }
+    .greeting-right {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #64748b;
+      line-height: 1.5;
+    }
 
-  .card h3 {
-    margin: 0 0 15px 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #475569;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    .greeting-right strong {
+      color: #334155;
+    }
 
-  .live-indicator {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-  }
+    /* GRID SYSTEM */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: minmax(min-content, max-content);
+      gap: 20px;
+    }
 
-  /* GRID SIZING CLASSES */
-  .col-3 { grid-column: span 3; }
-  .col-4 { grid-column: span 4; }
-  .col-5 { grid-column: span 5; }
-  .col-8 { grid-column: span 8; }
-  .col-12 { grid-column: span 12; }
+    /* CARDS */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
 
-  /* SPECIFIC COMPONENT STYLES */
-  
-  /* Total Alumni */
-  .alumni-count-card {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-  .alumni-count-card h1 {
-    margin: 0;
-    font-size: 3.5rem;
-    font-weight: 700;
-    color: #3b82f6;
-  }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
 
-  /* Quick Actions */
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center;
-  }
-  .actions button {
-    flex: 1 1 calc(33% - 15px);
-    padding: 15px;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    background: #f8fafc;
-    color: #334155;
-    font-weight: 600;
-    font-family: 'Outfit', Arial, sans-serif;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  .actions button:hover {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-    transform: translateY(-2px);
-  }
+    .card h3 {
+      margin: 0 0 15px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  /* Forms Global */
-  input, select {
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
-    color: #334155;
-    padding: 12px 15px;
-    border-radius: 8px;
-    font-family: 'Outfit', Arial, sans-serif;
-    outline: none;
-    transition: border-color 0.3s ease;
-  }
-  input::placeholder { color: #94a3b8; }
-  input:focus, select:focus {
-    border-color: #3b82f6;
-    background: #ffffff;
-  }
+    .live-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+    }
 
-  /* Horizontal Job Form */
-  .job-form-container {
-    display: flex;
-    gap: 15px;
-    width: 100%;
-    align-items: flex-end;
-  }
-  .job-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-  }
-  .job-form-group label {
-    font-size: 0.85rem;
-    color: #64748b;
-    font-weight: 600;
-  }
+    /* UTILITIES */
+    .hidden {
+      display: none !important;
+    }
 
-  /* Vertical Internship Form */
-  .intern-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
+    /* GRID SIZING CLASSES */
+    .col-3 {
+      grid-column: span 3;
+    }
 
-  /* Buttons */
-  .post-btn {
-    background: #3b82f6;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Outfit', Arial, sans-serif;
-    height: 44px; /* Match input heights */
-  }
-  .post-btn:hover {
-    background: #2563eb;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-  }
+    .col-4 {
+      grid-column: span 4;
+    }
 
-  /* Lists (Notifications, Events, Feedbacks) */
-  .list-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .list-item {
-    background: #f8fafc;
-    padding: 12px;
-    border-radius: 8px;
-    border-left: 3px solid transparent;
-    border: 1px solid #e2e8f0;
-    border-left-width: 4px;
-  }
-  .list-item.new { border-left-color: #3b82f6; }
-  .list-item.event { border-left-color: #f59e0b; }
-  .list-item.feedback { border-left-color: #8b5cf6; }
-  .list-item p { margin: 0; font-size: 0.95rem; color: #1e293b; }
-  .list-item span { font-size: 0.8rem; color: #64748b; }
+    .col-5 {
+      grid-column: span 5;
+    }
 
-  /* RESPONSIVE STYLES */
-  @media (max-width: 1200px) {
-    .col-3, .col-4, .col-5, .col-8 { grid-column: span 6; }
-    .job-form-container { flex-wrap: wrap; }
-    .job-form-container .job-form-group { flex: 1 1 30%; }
-    .job-form-container .post-btn { width: 100%; }
-  }
-  @media (max-width: 768px) {
-    .container { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
-    .col-3, .col-4, .col-5, .col-8, .col-12 { grid-column: span 12; }
-    .job-form-container .job-form-group { flex: 1 1 100%; }
-    .greeting-section { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .greeting-right { text-align: left; }
-  }
-</style>
+    .col-8 {
+      grid-column: span 8;
+    }
+
+    .col-12 {
+      grid-column: span 12;
+    }
+
+    /* SPECIFIC COMPONENT STYLES */
+
+    /* Total Alumni */
+    .alumni-count-card {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .alumni-count-card h1 {
+      margin: 0;
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: #3b82f6;
+    }
+
+    /* Quick Actions */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .actions button {
+      flex: 1 1 calc(33% - 15px);
+      padding: 15px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 600;
+      font-family: 'Outfit', Arial, sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .actions button:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+    }
+
+    /* Forms Global */
+    input,
+    select {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 12px 15px;
+      border-radius: 8px;
+      font-family: 'Outfit', Arial, sans-serif;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input::placeholder {
+      color: #94a3b8;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #3b82f6;
+      background: #ffffff;
+    }
+
+    /* Horizontal Job Form */
+    .job-form-container {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      align-items: flex-end;
+    }
+
+    .job-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .job-form-group label {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Vertical Internship Form */
+    .intern-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Buttons */
+    .post-btn {
+      background: #3b82f6;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Outfit', Arial, sans-serif;
+      height: 44px;
+      /* Match input heights */
+    }
+
+    .post-btn:hover {
+      background: #2563eb;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Lists (Notifications, Events, Feedbacks) */
+    .list-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .list-item {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid transparent;
+      border: 1px solid #e2e8f0;
+      border-left-width: 4px;
+    }
+
+    .list-item.new {
+      border-left-color: #3b82f6;
+    }
+
+    .list-item.event {
+      border-left-color: #f59e0b;
+    }
+
+    .list-item.feedback {
+      border-left-color: #8b5cf6;
+    }
+
+    .list-item p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #1e293b;
+    }
+
+    .list-item span {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    /* RESPONSIVE STYLES */
+    @media (max-width: 1200px) {
+
+      .col-3,
+      .col-4,
+      .col-5,
+      .col-8 {
+        grid-column: span 6;
+      }
+
+      .job-form-container {
+        flex-wrap: wrap;
+      }
+
+      .job-form-container .job-form-group {
+        flex: 1 1 30%;
+      }
+
+      .job-form-container .post-btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .col-3,
+      .col-4,
+      .col-5,
+      .col-8,
+      .col-12 {
+        grid-column: span 12;
+      }
+
+      .job-form-container .job-form-group {
+        flex: 1 1 100%;
+      }
+
+      .greeting-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .greeting-right {
+        text-align: left;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-  <div class="logo">AlumniPortal Pro</div>
-  
-  <div class="profile-avatar" onclick="window.location.href='profile.html'" title="My Profile">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-  </div>
-</div>
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo">AlumniPortal Pro</div>
 
-<!-- MAIN -->
-<div class="container">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <button class="active">Dashboard</button>
-    <button>Find Alumni</button>
-    <button>Jobs</button>
-    <button>Events</button>
-    <button onclick="logout()" style="margin-top: auto; color: #ef4444;">Logout</button>
+    <div class="profile-avatar" onclick="window.location.href='profile.html'" title="My Profile">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
   </div>
 
-  <!-- CONTENT -->
-  <div class="content">
+  <!-- MAIN -->
+  <div class="container">
 
-    <!-- GREETING SECTION -->
-    <div class="greeting-section">
-      <div class="greeting-left">
-        <h2 id="greetingMsg">Good Morning, Guest</h2>
-        <p>Welcome back to your comprehensive minimal dashboard.</p>
-      </div>
-      <div class="greeting-right">
-        <strong>CSE | Full Stack Web Development</strong><br/>
-        Lovely Professional University, Punjab
-      </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <button id="dashboardTabBtn" class="active">Dashboard</button>
+      <button>Find Alumni</button>
+      <button>Jobs</button>
+      <button>Events</button>
+      <button id="donationTabBtn">Donation</button>
+      <button onclick="logout()" style="margin-top: auto; color: #ef4444;">Logout</button>
     </div>
 
-    <div class="grid">
+    <!-- CONTENT -->
+    <div class="content">
 
-      <!-- TOTAL ALUMNI (Col-3) -->
-      <div class="card col-3 alumni-count-card">
-        <h3>Total Alumni <span class="live-indicator" style="background:#3b82f6;" title="Verified Users"></span></h3>
-        <h1 id="alumniCount">0</h1>
-        <p style="color: #94a3b8; font-size: 0.85rem; margin: 10px 0 0 0;">Connected Platform</p>
-      </div>
+      <!-- DASHBOARD VIEW -->
+      <div id="dashboardView">
 
-      <!-- QUICK ACTIONS (Col-5) -->
-      <div class="card col-5">
-        <h3>Quick Actions</h3>
-        <div class="actions">
-          <button>🔍 Find Alumni</button>
-          <button>📅 Register Event</button>
-          <button>💼 View Jobs</button>
-        </div>
-      </div>
-
-      <!-- NOTIFICATIONS (Col-4) -->
-      <div class="card col-4">
-        <h3>Job Notifications <span class="live-indicator"></span></h3>
-        <div class="list-wrapper" id="notificationsList">
-          <div class="list-item">
-            <p>Loading...</p>
+        <!-- GREETING SECTION -->
+        <div class="greeting-section">
+          <div class="greeting-left">
+            <h2 id="greetingMsg">Good Morning, Guest</h2>
+            <p>Welcome back, have a great day ahead!</p>
+          </div>
+          <div class="greeting-right">
+            <strong>CSE | Full Stack Web Development</strong><br />
+            Lovely Professional University, Punjab
           </div>
         </div>
-      </div>
 
-      <!-- JOB FORM (Col-12 Horizontal) -->
-      <div class="card col-12">
-        <h3>Post a New Job</h3>
-        <div class="job-form-container">
-          <div class="job-form-group">
-            <label>Title</label>
-            <input type="text" id="jobTitle" placeholder="e.g. Frontend Developer">
+        <div class="grid">
+
+          <!-- TOTAL ALUMNI (Col-3) -->
+          <div class="card col-3 alumni-count-card">
+            <h3>Total Alumni <span class="live-indicator" style="background:#3b82f6;" title="Verified Users"></span>
+            </h3>
+            <h1 id="alumniCount">0</h1>
+            <p style="color: #94a3b8; font-size: 0.85rem; margin: 10px 0 0 0;">Connected Platform</p>
           </div>
-          <div class="job-form-group">
-            <label>Type</label>
-            <select id="jobType">
-              <option value="remote">Remote</option>
-              <option value="onsite">Onsite</option>
-              <option value="hybrid">Hybrid</option>
+
+          <!-- FUNDING RECEIVED (Col-5) -->
+          <div class="card col-5">
+            <h3>Funding Received</h3>
+            <div class="list-wrapper" id="fundingList">
+              <div class="list-item">
+                <p>Loading donations...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTIFICATIONS (Col-4) -->
+          <div class="card col-4">
+            <h3>Job Notifications <span class="live-indicator"></span></h3>
+            <div class="list-wrapper" id="notificationsList">
+              <div class="list-item">
+                <p>Loading...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- JOB FORM (Col-12 Horizontal) -->
+          <div class="card col-12">
+            <h3>Post a New Job</h3>
+            <div class="job-form-container">
+              <div class="job-form-group">
+                <label>Title</label>
+                <input type="text" id="jobTitle" placeholder="e.g. Frontend Developer">
+              </div>
+              <div class="job-form-group">
+                <label>Type</label>
+                <select id="jobType">
+                  <option value="remote">Remote</option>
+                  <option value="onsite">Onsite</option>
+                  <option value="hybrid">Hybrid</option>
+                </select>
+              </div>
+              <div class="job-form-group">
+                <label>Location</label>
+                <input type="text" id="jobLocation" placeholder="e.g. New York, NY">
+              </div>
+              <div class="job-form-group">
+                <label>Vacancy</label>
+                <input type="number" id="jobVacancy" placeholder="e.g. 3">
+              </div>
+              <div class="job-form-group">
+                <label>Register Link</label>
+                <input type="url" id="jobLink" placeholder="https://...">
+              </div>
+              <button class="post-btn" id="postJobBtn">Post Job</button>
+            </div>
+          </div>
+
+          <!-- INTERNSHIP FORM (Col-4 Vertical) -->
+          <div class="card col-4">
+            <h3>Post Internship</h3>
+            <div class="intern-form">
+              <input type="text" id="internTitle" placeholder="Internship Title">
+              <select id="internType">
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+              </select>
+              <input type="text" id="internLocation" placeholder="Location">
+              <input type="text" id="internStipend" placeholder="Stipend (e.g. $1000/mo)">
+              <input type="url" id="internLink" placeholder="Application Link">
+              <button class="post-btn" id="postInternBtn">Post Internship</button>
+            </div>
+          </div>
+
+          <!-- EVENTS (Col-4) -->
+          <div class="card col-4">
+            <h3>Upcoming Events <span class="live-indicator" style="background:#f59e0b;"></span></h3>
+            <div class="list-wrapper">
+              <div class="list-item event">
+                <p><strong>Tech Meetup 2026</strong></p>
+                <span>Aug 15 • San Francisco, CA</span>
+              </div>
+              <div class="list-item event">
+                <p><strong>Alumni Career Fair</strong></p>
+                <span>Sep 10 • Virtual</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FEEDBACK (Col-4) -->
+          <div class="card col-4">
+            <h3>Feedbacks Received</h3>
+            <div class="list-wrapper">
+              <div class="list-item feedback">
+                <p>"Great networking event last Friday!"</p>
+                <span>- Alex J. (Class of '22)</span>
+              </div>
+              <div class="list-item feedback">
+                <p>"The new job portal layout is very clean."</p>
+                <span>- Maria S. (Class of '24)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div> <!-- Ending dashboardView -->
+
+      <!-- DONATION VIEW -->
+      <div id="donationView" class="hidden">
+        <div class="card col-12" style="max-width: 600px; margin: 0 auto; margin-top: 20px;">
+          <h2 style="margin: 0 0 5px 0; color: #0f172a;">Make a Donation</h2>
+          <p style="color: #64748b; margin-top: 0px; margin-bottom: 25px; font-size: 0.95rem;">Support our university's
+            growth and vision. Your contribution makes a difference.</p>
+          <div class="intern-form">
+            <label style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: -10px;">Donation Amount
+              (USD)</label>
+            <input type="number" id="donAmount" placeholder="e.g. 500">
+
+            <label style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: -10px;">Donation
+              Cause</label>
+            <select id="donCause">
+              <option value="Medical aid">Medical aid</option>
+              <option value="Research and innovation">Research and innovation</option>
+              <option value="Education">Education</option>
+              <option value="Disaster">Disaster</option>
             </select>
-          </div>
-          <div class="job-form-group">
-            <label>Location</label>
-            <input type="text" id="jobLocation" placeholder="e.g. New York, NY">
-          </div>
-          <div class="job-form-group">
-            <label>Vacancy</label>
-            <input type="number" id="jobVacancy" placeholder="e.g. 3">
-          </div>
-          <div class="job-form-group">
-            <label>Register Link</label>
-            <input type="url" id="jobLink" placeholder="https://...">
-          </div>
-          <button class="post-btn" id="postJobBtn">Post Job</button>
-        </div>
-      </div>
 
-      <!-- INTERNSHIP FORM (Col-4 Vertical) -->
-      <div class="card col-4">
-        <h3>Post Internship</h3>
-        <div class="intern-form">
-          <input type="text" id="internTitle" placeholder="Internship Title">
-          <select id="internType">
-            <option value="online">Online</option>
-            <option value="offline">Offline</option>
-          </select>
-          <input type="text" id="internLocation" placeholder="Location">
-          <input type="text" id="internStipend" placeholder="Stipend (e.g. $1000/mo)">
-          <input type="url" id="internLink" placeholder="Application Link">
-          <button class="post-btn" id="postInternBtn">Post Internship</button>
-        </div>
-      </div>
+            <label style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: -10px;">Payment
+              Method</label>
+            <select id="donPayment">
+              <option value="Credit/Debit Card">Credit/Debit Card</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="UPI">UPI</option>
+            </select>
 
-      <!-- EVENTS (Col-4) -->
-      <div class="card col-4">
-        <h3>Upcoming Events <span class="live-indicator" style="background:#f59e0b;"></span></h3>
-        <div class="list-wrapper">
-          <div class="list-item event">
-            <p><strong>Tech Meetup 2026</strong></p>
-            <span>Aug 15 • San Francisco, CA</span>
-          </div>
-          <div class="list-item event">
-            <p><strong>Alumni Career Fair</strong></p>
-            <span>Sep 10 • Virtual</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FEEDBACK (Col-4) -->
-      <div class="card col-4">
-        <h3>Feedbacks Received</h3>
-        <div class="list-wrapper">
-          <div class="list-item feedback">
-            <p>"Great networking event last Friday!"</p>
-            <span>- Alex J. (Class of '22)</span>
-          </div>
-          <div class="list-item feedback">
-            <p>"The new job portal layout is very clean."</p>
-            <span>- Maria S. (Class of '24)</span>
+            <button class="post-btn" id="donateBtn" style="margin-top: 15px;">Donate Now</button>
           </div>
         </div>
       </div>
 
     </div>
-
   </div>
-</div>
 
-<script>
-// Greeting Logic
-function updateGreeting() {
-  const userName = localStorage.getItem("name") || "Alumni";
-  const hour = new Date().getHours();
-  let greeting = "Good Evening";
-  
-  if (hour < 12) greeting = "Good Morning";
-  else if (hour < 18) greeting = "Good Afternoon";
-  
-  document.getElementById("greetingMsg").innerText = `${greeting}, ${userName}!`;
-}
-updateGreeting();
+  <script>
+    // Greeting Logic
+    function updateGreeting() {
+      const userName = localStorage.getItem("name") || "Alumni";
+      const hour = new Date().getHours();
+      let greeting = "Good Evening";
 
-// Keep existing logout functionality
-function logout() {
-  localStorage.clear();
-  window.location.href = "../auth.html";
-}
+      if (hour < 12) greeting = "Good Morning";
+      else if (hour < 18) greeting = "Good Afternoon";
 
-const BASE_URL = "http://localhost:5000/api";
-const userId = localStorage.getItem("userId") || null;
-
-// Fetch Real Alumni Count
-async function fetchAlumniCount() {
-  try {
-    const res = await fetch(`${BASE_URL}/users/stats`);
-    const data = await res.json();
-    if(data.totalAlumni !== undefined) {
-      document.getElementById('alumniCount').innerText = data.totalAlumni.toLocaleString();
+      document.getElementById("greetingMsg").innerText = `${greeting}, ${userName}!`;
     }
-  } catch (err) {
-    console.error("Error fetching alumni stats:", err);
-  }
-}
+    updateGreeting();
 
-// Fetch Posts and populate Notifications
-async function fetchPosts() {
-  try {
-    const res = await fetch(`${BASE_URL}/posts`);
-    const posts = await res.json();
-    const notificationsList = document.getElementById("notificationsList");
-    notificationsList.innerHTML = "";
+    // Keep existing logout functionality
+    function logout() {
+      localStorage.clear();
+      window.location.href = "../auth.html";
+    }
 
-    posts.forEach(post => {
-      // Create HTML depending on postType
-      const div = document.createElement("div");
-      div.className = "list-item new";
-      
-      const title = post.title || "Untitled";
-      const location = post.location || post.company || "Unknown";
-      const type = post.postType === "internship" ? "Internship" : (post.postType === "job" ? "Job" : "General");
+    const BASE_URL = "http://localhost:5000/api";
+    const userId = localStorage.getItem("userId") || null;
 
-      div.innerHTML = `
+    // Fetch Real Alumni Count
+    async function fetchAlumniCount() {
+      try {
+        const res = await fetch(`${BASE_URL}/users/stats`);
+        const data = await res.json();
+        if (data.totalAlumni !== undefined) {
+          document.getElementById('alumniCount').innerText = data.totalAlumni.toLocaleString();
+        }
+      } catch (err) {
+        console.error("Error fetching alumni stats:", err);
+      }
+    }
+
+    // Fetch Donations History
+    async function fetchDonations() {
+      try {
+        const res = await fetch(`${BASE_URL}/donations`);
+        const donations = await res.json();
+        const fundingList = document.getElementById("fundingList");
+        if (fundingList) fundingList.innerHTML = "";
+
+        if (donations.length === 0) {
+          if (fundingList) fundingList.innerHTML = `<div class="list-item"><p>No donations yet.</p></div>`;
+          return;
+        }
+
+        donations.forEach(don => {
+          const div = document.createElement("div");
+          div.className = "list-item new";
+          const donorName = don.userId ? don.userId.name : "Anonymous";
+          const dTime = new Date(don.createdAt).toLocaleDateString();
+
+          div.innerHTML = `
+            <p><strong>${donorName}</strong> donated $${don.amount}</p>
+            <span>Cause: ${don.cause} • ${dTime}</span>
+          `;
+          if (fundingList) fundingList.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error fetching donations:", err);
+      }
+    }
+
+    // Fetch Posts and populate Notifications
+    async function fetchPosts() {
+      try {
+        const res = await fetch(`${BASE_URL}/posts`);
+        const posts = await res.json();
+        const notificationsList = document.getElementById("notificationsList");
+        if (notificationsList) notificationsList.innerHTML = "";
+
+        posts.forEach(post => {
+          // Create HTML depending on postType
+          const div = document.createElement("div");
+          div.className = "list-item new";
+
+          const title = post.title || "Untitled";
+          const location = post.location || post.company || "Unknown";
+          const type = post.postType === "internship" ? "Internship" : (post.postType === "job" ? "Job" : "General");
+
+          div.innerHTML = `
         <p><strong>${title} (${type})</strong></p>
         <span>Location: ${location}</span>
       `;
-      notificationsList.appendChild(div);
+          notificationsList.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
+    }
+
+    document.getElementById("postJobBtn").onclick = async () => {
+      const payload = {
+        title: document.getElementById("jobTitle").value,
+        postType: "job",
+        type: document.getElementById("jobType").value,
+        location: document.getElementById("jobLocation").value,
+        vacancy: Number(document.getElementById("jobVacancy").value),
+        link: document.getElementById("jobLink").value,
+        postedBy: userId
+      };
+
+      try {
+        await fetch(`${BASE_URL}/posts/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        alert("Job posted successfully!");
+        fetchPosts(); // refresh list
+      } catch (e) { alert("Error posting job"); }
+    };
+
+    document.getElementById("postInternBtn").onclick = async () => {
+      const payload = {
+        title: document.getElementById("internTitle").value,
+        postType: "internship",
+        type: document.getElementById("internType").value,
+        location: document.getElementById("internLocation").value,
+        stipend: document.getElementById("internStipend").value,
+        link: document.getElementById("internLink").value,
+        postedBy: userId
+      };
+
+      try {
+        await fetch(`${BASE_URL}/posts/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        alert("Internship posted successfully!");
+        fetchPosts(); // refresh list
+      } catch (e) { alert("Error posting internship"); }
+    };
+
+    document.getElementById("donateBtn").onclick = async () => {
+      const payload = {
+        amount: Number(document.getElementById("donAmount").value),
+        cause: document.getElementById("donCause").value,
+        paymentMethod: document.getElementById("donPayment").value,
+        userId: userId
+      };
+
+      try {
+        await fetch(`${BASE_URL}/donations/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        alert("Donation successful! Thank you!");
+        document.getElementById("donAmount").value = "";
+
+        // Return to dash UI
+        dashboardTabBtn.click();
+        fetchDonations();
+      } catch (e) { alert("Error making donation"); }
+    };
+
+    // Toggle Logic
+    const dashboardTabBtn = document.getElementById("dashboardTabBtn");
+    const donationTabBtn = document.getElementById("donationTabBtn");
+    const dashboardView = document.getElementById("dashboardView");
+    const donationView = document.getElementById("donationView");
+
+    dashboardTabBtn.addEventListener("click", () => {
+      dashboardTabBtn.classList.add("active");
+      donationTabBtn.classList.remove("active");
+      dashboardView.classList.remove("hidden");
+      donationView.classList.add("hidden");
     });
-  } catch (err) {
-    console.error("Error fetching posts:", err);
-  }
-}
 
-document.getElementById("postJobBtn").onclick = async () => {
-  const payload = {
-    title: document.getElementById("jobTitle").value,
-    postType: "job",
-    type: document.getElementById("jobType").value,
-    location: document.getElementById("jobLocation").value,
-    vacancy: Number(document.getElementById("jobVacancy").value),
-    link: document.getElementById("jobLink").value,
-    postedBy: userId
-  };
-
-  try {
-    await fetch(`${BASE_URL}/posts/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    donationTabBtn.addEventListener("click", () => {
+      donationTabBtn.classList.add("active");
+      dashboardTabBtn.classList.remove("active");
+      donationView.classList.remove("hidden");
+      dashboardView.classList.add("hidden");
     });
-    alert("Job posted successfully!");
-    fetchPosts(); // refresh list
-  } catch(e) { alert("Error posting job"); }
-};
 
-document.getElementById("postInternBtn").onclick = async () => {
-  const payload = {
-    title: document.getElementById("internTitle").value,
-    postType: "internship",
-    type: document.getElementById("internType").value,
-    location: document.getElementById("internLocation").value,
-    stipend: document.getElementById("internStipend").value,
-    link: document.getElementById("internLink").value,
-    postedBy: userId
-  };
+    // Initial calls
+    fetchAlumniCount();
+    fetchPosts();
+    fetchDonations();
 
-  try {
-    await fetch(`${BASE_URL}/posts/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    alert("Internship posted successfully!");
-    fetchPosts(); // refresh list
-  } catch(e) { alert("Error posting internship"); }
-};
-
-// Initial calls
-fetchAlumniCount();
-fetchPosts();
-// Poll every certain interval for live-feel
-setInterval(fetchAlumniCount, 15000);
-setInterval(fetchPosts, 15000);
-</script>
+    // Poll every certain interval for live-feel
+    setInterval(fetchAlumniCount, 15000);
+    setInterval(fetchPosts, 15000);
+    setInterval(fetchDonations, 15000);
+  </script>
 
 </body>
+
 </html>

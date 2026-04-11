@@ -9,12 +9,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["admin", "alumni", "student"]
-  },
-  aboutMe: { type: String, default: "" },
-  department: { type: String, default: "" },
-  contactNumber: { type: String, default: "" },
-  company: { type: String, default: "" },
-  jobType: { type: String, default: "" }
+  }
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);

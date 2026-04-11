@@ -9,8 +9,8 @@
   body {
     margin: 0;
     font-family: 'Outfit', Arial, sans-serif;
-    background: #f4f6f8;
-    color: #333333;
+    background: radial-gradient(circle at top, #222222, #000000);
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,12 +20,13 @@
 
   /* Modal */
   .modal {
-    background: #ffffff;
+    background: #111111;
     padding: 40px;
     width: 380px;
     border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    backdrop-filter: blur(20px);
+    border: 1px solid #333333;
     animation: fadeIn 0.6s ease-out;
   }
 
@@ -39,7 +40,7 @@
     margin-top: 0;
     margin-bottom: 25px;
     font-size: 1.8rem;
-    color: #0f172a;
+    color: yellow;
   }
 
   /* Tabs */
@@ -56,7 +57,7 @@
     border-radius: 10px;
     cursor: pointer;
     background: transparent;
-    color: #64748b;
+    color: #aaaaaa;
     font-family: 'Outfit', Arial, sans-serif;
     font-weight: 600;
     font-size: 1rem;
@@ -64,9 +65,9 @@
   }
 
   .tabs button.active {
-    background: #3b82f6;
+    background: orange;
     color: white;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
   }
 
   /* Inputs */
@@ -74,9 +75,9 @@
     width: 100%;
     margin: 8px 0;
     padding: 14px;
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
-    color: #334155;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #333333;
+    color: white;
     border-radius: 10px;
     font-family: 'Outfit', Arial, sans-serif;
     outline: none;
@@ -84,18 +85,15 @@
     box-sizing: border-box;
   }
   
-  input::placeholder { color: #94a3b8; }
-  input:focus { 
-    border-color: #3b82f6; 
-    background: #ffffff;
-  }
+  input::placeholder { color: #aaaaaa; }
+  input:focus { border-color: orange; }
 
   /* Button */
   button.submit {
     width: 100%;
     padding: 14px;
-    background: #3b82f6;
-    color: white;
+    background: orange;
+    color: black;
     border: none;
     border-radius: 10px;
     margin-top: 15px;
@@ -107,8 +105,8 @@
   }
 
   button.submit:hover {
-    background: #2563eb;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    background: yellow;
+    box-shadow: 0 5px 20px rgba(255, 255, 0, 0.5);
     transform: translateY(-2px);
   }
 
