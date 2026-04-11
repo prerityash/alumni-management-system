@@ -16,3 +16,5 @@ export function renderPosts(posts) {
     container.appendChild(div);
   });
 }
+
+

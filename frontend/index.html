@@ -1,30 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Alumni Management</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>Alumni Network</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <header>
-    <h1>Alumni Network</h1>
-  </header>
+<header>
+  <h1>Alumni Network</h1>
+  <button id="openAuth">Login / Signup</button>
+</header>
 
-  <section class="create-post">
-    <h2>Create Job Post</h2>
-    <input type="text" id="title" placeholder="Job Title">
-    <input type="text" id="company" placeholder="Company">
-    <input type="text" id="link" placeholder="Apply Link">
-    <textarea id="description" placeholder="Description"></textarea>
-    <button id="postBtn">Post</button>
-  </section>
+<!-- MODAL -->
+<div id="authModal" class="modal hidden">
+  <div class="modal-content">
 
-  <section class="posts">
-    <h2>Opportunities</h2>
-    <div id="postList"></div>
-  </section>
+    <span id="closeModal">&times;</span>
 
-  <script type="module" src="js/main.js"></script>
+    <h2 id="formTitle">Login</h2>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <input id="loginId" placeholder="College ID">
+      <input id="loginPass" type="password" placeholder="Password">
+      <button id="loginBtn">Login</button>
+      <p>Don't have account? <span id="showSignup">Signup</span></p>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" class="hidden">
+      <input id="name" placeholder="Name">
+      <input id="collegeId" placeholder="College ID">
+      <input id="email" placeholder="College Email">
+      <select id="year"></select>
+      <input id="password" type="password" placeholder="Password">
+      <button id="signupBtn">Signup</button>
+      <p>Already have account? <span id="showLogin">Login</span></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<section class="create-post hidden">
+  <h2>Create Post</h2>
+  <input id="title" placeholder="Title">
+  <input id="company" placeholder="Company">
+  <input id="link" placeholder="Link">
+  <textarea id="description"></textarea>
+  <button id="postBtn">Post</button>
+</section>
+
+<section class="posts">
+  <h2>Opportunities</h2>
+  <div id="postList"></div>
+</section>
+
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
