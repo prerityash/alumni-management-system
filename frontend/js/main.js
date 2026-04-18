@@ -6,7 +6,7 @@ import { renderPosts } from "./ui.js";
 const role = localStorage.getItem("role");
 //protected
 if (!role) {
-  window.location.href = "auth.html";
+  window.location.href = "index.html";
 }
 
 const name = localStorage.getItem("name");
@@ -20,7 +20,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 logoutBtn.addEventListener("click", () => {
   localStorage.clear();
-  window.location.href = "auth.html";
+  window.location.href = "index.html";
 });
 
 // Modal controls

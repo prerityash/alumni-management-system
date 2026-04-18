@@ -370,6 +370,14 @@
       color: #64748b;
     }
 
+    /* Toggle Switch */
+    .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e2e8f0; transition: .4s; border-radius: 20px; }
+    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #10b981; }
+    input:checked + .slider:before { transform: translateX(14px); }
+
     /* RESPONSIVE STYLES */
     @media (max-width: 1200px) {
 
@@ -445,26 +453,26 @@
     </div>
   </div>
 
-  <!-- MAIN -->
+
   <div class="container">
 
-    <!-- SIDEBAR -->
+
     <div class="sidebar">
       <button id="dashboardTabBtn" class="active">Dashboard</button>
-      <button>Find Alumni</button>
-      <button>Jobs</button>
+      <button onclick="window.location.href='../find-alumni.html'">Find Alumni</button>
+      <button onclick="window.location.href='../opportunities.html'">Jobs Board</button>
       <button>Events</button>
       <button id="donationTabBtn">Donation</button>
       <button onclick="logout()" style="margin-top: auto; color: #ef4444;">Logout</button>
     </div>
 
-    <!-- CONTENT -->
+
     <div class="content">
 
-      <!-- DASHBOARD VIEW -->
+
       <div id="dashboardView">
 
-        <!-- GREETING SECTION -->
+
         <div class="greeting-section">
           <div class="greeting-left">
             <h2 id="greetingMsg">Good Morning, Guest</h2>
@@ -478,7 +486,7 @@
 
         <div class="grid">
 
-          <!-- TOTAL ALUMNI (Col-3) -->
+
           <div class="card col-3 alumni-count-card">
             <h3>Total Alumni <span class="live-indicator" style="background:#3b82f6;" title="Verified Users"></span>
             </h3>
@@ -486,7 +494,7 @@
             <p style="color: #94a3b8; font-size: 0.85rem; margin: 10px 0 0 0;">Connected Platform</p>
           </div>
 
-          <!-- FUNDING RECEIVED (Col-5) -->
+
           <div class="card col-5">
             <h3>Funding Received</h3>
             <div class="list-wrapper" id="fundingList">
@@ -509,12 +517,20 @@
           <!-- JOB FORM (Col-12 Horizontal) -->
           <div class="card col-12">
             <h3>Post a New Job</h3>
-            <div class="job-form-container">
-              <div class="job-form-group">
-                <label>Title</label>
-                <input type="text" id="jobTitle" placeholder="e.g. Frontend Developer">
+            <div class="job-form-container" style="flex-wrap: wrap; gap: 15px;">
+              <div class="job-form-group" style="flex: 1 1 30%;">
+                <label>Job Name</label>
+                <input type="text" id="jobTitle" placeholder="e.g. Senior Frontend Dev">
               </div>
-              <div class="job-form-group">
+              <div class="job-form-group" style="flex: 1 1 30%;">
+                <label>Role</label>
+                <input type="text" id="jobRole" placeholder="e.g. Software Engineer">
+              </div>
+              <div class="job-form-group" style="flex: 1 1 30%;">
+                <label>Experience</label>
+                <input type="text" id="jobExperience" placeholder="e.g. 2-4 Years">
+              </div>
+              <div class="job-form-group" style="flex: 1 1 20%;">
                 <label>Type</label>
                 <select id="jobType">
                   <option value="remote">Remote</option>
@@ -522,19 +538,19 @@
                   <option value="hybrid">Hybrid</option>
                 </select>
               </div>
-              <div class="job-form-group">
+              <div class="job-form-group" style="flex: 1 1 20%;">
                 <label>Location</label>
                 <input type="text" id="jobLocation" placeholder="e.g. New York, NY">
               </div>
-              <div class="job-form-group">
+              <div class="job-form-group" style="flex: 1 1 20%;">
                 <label>Vacancy</label>
                 <input type="number" id="jobVacancy" placeholder="e.g. 3">
               </div>
-              <div class="job-form-group">
+              <div class="job-form-group" style="flex: 1 1 30%;">
                 <label>Register Link</label>
-                <input type="url" id="jobLink" placeholder="https://...">
+                <input type="url" id="jobLink" placeholder="https://apply...">
               </div>
-              <button class="post-btn" id="postJobBtn">Post Job</button>
+              <button class="post-btn" id="postJobBtn" style="margin-top: 18px; flex: 1 1 100%;">Post Job</button>
             </div>
           </div>
 
@@ -554,33 +570,27 @@
             </div>
           </div>
 
-          <!-- EVENTS (Col-4) -->
+          <!-- MENTORSHIP BOOKINGS (Col-4) -->
           <div class="card col-4">
-            <h3>Upcoming Events <span class="live-indicator" style="background:#f59e0b;"></span></h3>
-            <div class="list-wrapper">
-              <div class="list-item event">
-                <p><strong>Tech Meetup 2026</strong></p>
-                <span>Aug 15 • San Francisco, CA</span>
-              </div>
-              <div class="list-item event">
-                <p><strong>Alumni Career Fair</strong></p>
-                <span>Sep 10 • Virtual</span>
-              </div>
+            <h3>Mentorship Bookings <span class="live-indicator" style="background:#8b5cf6;"></span></h3>
+            <div class="list-wrapper" id="mentorBookingsList">
+              <div class="list-item"><p>Loading bookings...</p></div>
             </div>
           </div>
 
-          <!-- FEEDBACK (Col-4) -->
+          <!-- MENTOR SETUP (Col-4) -->
           <div class="card col-4">
-            <h3>Feedbacks Received</h3>
-            <div class="list-wrapper">
-              <div class="list-item feedback">
-                <p>"Great networking event last Friday!"</p>
-                <span>- Alex J. (Class of '22)</span>
-              </div>
-              <div class="list-item feedback">
-                <p>"The new job portal layout is very clean."</p>
-                <span>- Maria S. (Class of '24)</span>
-              </div>
+            <h3 style="display:flex; justify-content:space-between; align-items:center;">
+              Mentor Setup 
+              <label class="switch"><input type="checkbox" id="mentorEnableBtn"><span class="slider"></span></label>
+            </h3>
+            <div class="intern-form">
+              <input type="text" id="mentorDay" placeholder="Availability Days (e.g. Weekends)">
+              <input type="text" id="mentorTime" placeholder="Time (e.g. 2 PM - 5 PM)">
+              <input type="email" id="mentorEmail" placeholder="Contact Email">
+              <input type="tel" id="mentorContact" placeholder="Contact Number">
+              <input type="url" id="mentorLink" placeholder="Google Meet Link">
+              <button class="post-btn" id="saveMentorBtn">Save Mentor Details</button>
             </div>
           </div>
 
@@ -641,7 +651,7 @@
     // Keep existing logout functionality
     function logout() {
       localStorage.clear();
-      window.location.href = "../auth.html";
+      window.location.href = "../index.html";
     }
 
     const BASE_URL = "http://localhost:5000/api";
@@ -721,6 +731,8 @@
     document.getElementById("postJobBtn").onclick = async () => {
       const payload = {
         title: document.getElementById("jobTitle").value,
+        role: document.getElementById("jobRole").value,
+        experience: document.getElementById("jobExperience").value,
         postType: "job",
         type: document.getElementById("jobType").value,
         location: document.getElementById("jobLocation").value,
@@ -805,10 +817,63 @@
       dashboardView.classList.add("hidden");
     });
 
-    // Initial calls
+    // Initialize Data
     fetchAlumniCount();
-    fetchPosts();
     fetchDonations();
+    fetchPosts();
+
+    // Mentor logic
+    async function initMentorSetup() {
+       try {
+         const res = await fetch(`${BASE_URL}/users/${userId}`);
+         const user = await res.json();
+         if(user.isMentorEnabled) document.getElementById('mentorEnableBtn').checked = true;
+         document.getElementById('mentorDay').value = user.mentorDay || '';
+         document.getElementById('mentorTime').value = user.mentorTime || '';
+         document.getElementById('mentorEmail').value = user.mentorEmail || user.email || '';
+         document.getElementById('mentorContact').value = user.mentorContact || '';
+         document.getElementById('mentorLink').value = user.mentorLink || '';
+       } catch(e) { console.error(e); }
+    }
+    initMentorSetup();
+
+    document.getElementById('saveMentorBtn').onclick = async () => {
+       const payload = {
+         isMentorEnabled: document.getElementById('mentorEnableBtn').checked,
+         mentorDay: document.getElementById('mentorDay').value,
+         mentorTime: document.getElementById('mentorTime').value,
+         mentorEmail: document.getElementById('mentorEmail').value,
+         mentorContact: document.getElementById('mentorContact').value,
+         mentorLink: document.getElementById('mentorLink').value
+       };
+       try {
+         await fetch(`${BASE_URL}/users/${userId}`, {
+           method: 'PUT', headers: {'Content-Type': 'application/json'},
+           body: JSON.stringify(payload)
+         });
+         alert("Mentor configuration saved!");
+       } catch(e) { alert("Failed to save configuration!"); }
+    };
+
+    async function fetchMentorBookings() {
+       try {
+         const res = await fetch(`${BASE_URL}/meetings/${userId}`);
+         const meetings = await res.json();
+         const list = document.getElementById("mentorBookingsList");
+         if(!list) return;
+         list.innerHTML = "";
+         if(meetings.length === 0) { list.innerHTML = `<div class="list-item"><p>No bookings yet.</p></div>`; return; }
+         meetings.forEach(m => {
+           list.innerHTML += `
+             <div class="list-item feedback">
+               <p><strong>${m.studentId?.name || 'Student'}</strong>: ${m.topic || 'Mentorship Request'}</p>
+               <span>${new Date(m.date).toLocaleDateString()} at ${new Date(m.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+             </div>
+           `;
+         });
+       } catch(e) { console.error(e); }
+    }
+    fetchMentorBookings();
 
     // Poll every certain interval for live-feel
     setInterval(fetchAlumniCount, 15000);

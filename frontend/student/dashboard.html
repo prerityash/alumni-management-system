@@ -1,12 +1,339 @@
-<h2>Student Dashboard</h2>
+<!DOCTYPE html>
+<html lang="en">
 
-<p>You can only view opportunities</p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Outfit', Arial, sans-serif;
+      background: #f4f6f8;
+      color: #333333;
+      overflow: hidden;
+    }
 
-<button onclick="logout()">Logout</button>
+    .navbar {
+      height: 70px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #0f172a;
+    }
+    .profile-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #e2e8f0; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .profile-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 
-<script>
-function logout() {
-  localStorage.clear();
-  window.location.href = "../auth.html";
-}
-</script>
+    .container { display: flex; height: calc(100vh - 70px); }
+    .sidebar {
+      width: 250px; background: #ffffff; border-right: 1px solid #e2e8f0;
+      padding: 20px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .sidebar button {
+      padding: 12px 20px; border: none; background: transparent; color: #64748b;
+      font-size: 1rem; font-weight: 600; text-align: left; border-radius: 8px;
+      cursor: pointer; transition: all 0.3s ease; font-family: 'Outfit', Arial, sans-serif;
+    }
+    .sidebar button:hover { background: #f1f5f9; color: #0f172a; }
+    .sidebar button.active { background: #3b82f6; color: white; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); }
+
+    .content {
+      flex: 1; padding: 30px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;
+    }
+
+    /* SLIDESHOW */
+    .slideshow-container {
+      width: 100%; height: 220px; margin-bottom: 25px; position: relative;
+      border-radius: 16px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .slide {
+      width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+      opacity: 0; transition: opacity 0.8s ease-in-out;
+      background-size: cover; background-position: center;
+    }
+    .slide.active { opacity: 1; }
+
+    .greeting-section {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #ffffff; padding: 25px 30px; border-radius: 16px;
+      border: 1px solid #e2e8f0; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .greeting-left h2 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+    .greeting-left p { margin: 5px 0 0 0; color: #64748b; font-size: 0.95rem; }
+    .greeting-right { text-align: right; font-size: 0.85rem; color: #64748b; line-height: 1.5; }
+    .greeting-right strong { color: #334155; }
+
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+    .card {
+      background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 25px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column;
+    }
+    .card h3 {
+      margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .live-indicator { display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+
+    .list-wrapper { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .list-item { 
+      background: #f8fafc; padding: 12px; border-radius: 8px; 
+      border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; 
+    }
+    .list-item.event { border-left-color: #f59e0b; }
+    .list-item.mentor { border-left-color: #8b5cf6; }
+    .list-item p { margin: 0; font-size: 0.95rem; color: #1e293b; }
+    .list-item span { font-size: 0.8rem; color: #64748b; }
+
+    @media (max-width: 1200px) {
+      .col-4, .col-6 { grid-column: span 6; }
+    }
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
+      .col-4, .col-6 { grid-column: span 12; }
+      .greeting-section { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .greeting-right { text-align: left; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="logo">AlumniPortal Pro</div>
+    <div class="profile-avatar" onclick="window.location.href='profile.html'" title="My Profile">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sidebar">
+      <button class="active">Dashboard</button>
+      <button onclick="window.location.href='../find-mentor.html'">Find Mentor</button>
+      <button onclick="window.location.href='../find-alumni.html'">Find Alumni</button>
+      <button onclick="window.location.href='../opportunities.html'">Opportunities</button>
+      <button>Events</button>
+      <button onclick="logout()" style="margin-top: auto; color: #ef4444;">Logout</button>
+    </div>
+
+    <div class="content">
+      <div id="dashboardView">
+        <div class="greeting-section">
+          <div class="greeting-left">
+            <h2 id="greetingMsg">Good Morning, Student</h2>
+            <p>Welcome back, have a great day ahead!</p>
+          </div>
+          <div class="greeting-right">
+            <strong>Lovely Professional University</strong><br />
+            Punjab
+          </div>
+        </div>
+        <div class="slideshow-container">
+          <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80')"></div>
+          <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80')"></div>
+          <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1200&q=80')"></div>
+        </div>
+
+        <div class="grid">
+          
+          <!-- SUGGESTED MENTORS -->
+          <div class="card col-4">
+            <h3>Suggested Mentors <span class="live-indicator" style="background:#8b5cf6;"></span></h3>
+            <div class="list-wrapper" id="mentorsList">
+              <div class="list-item mentor"><p>Loading mentors...</p></div>
+            </div>
+          </div>
+
+          <!-- MENTOR MEETINGS -->
+          <div class="card col-4">
+            <h3>Booked Sessions</h3>
+            <div class="list-wrapper" id="meetingsList">
+              <div class="list-item"><p>Loading sessions...</p></div>
+            </div>
+          </div>
+
+          <!-- JOBS ACTIVITY -->
+          <div class="card col-4">
+            <h3>Jobs Activity</h3>
+            <div class="list-wrapper" id="activityList">
+              <div class="list-item"><p>Loading activity...</p></div>
+            </div>
+          </div>
+
+          <!-- JOB NOTIFICATIONS -->
+          <div class="card col-6">
+            <h3>Job Notifications <span class="live-indicator"></span></h3>
+            <div class="list-wrapper" id="notificationsList">
+               <div class="list-item"><p>Loading jobs...</p></div>
+            </div>
+          </div>
+
+          <!-- FUNDING -->
+          <div class="card col-6">
+            <h3>Funding Received</h3>
+            <div class="list-wrapper" id="fundingList">
+               <div class="list-item"><p>Loading donations...</p></div>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = "http://localhost:5000/api";
+    const userId = localStorage.getItem("userId");
+
+    // Utilities
+    function logout() {
+      localStorage.clear();
+      window.location.href = "../index.html";
+    }
+
+    function updateGreeting() {
+      const userName = localStorage.getItem("name") || "Student";
+      const hour = new Date().getHours();
+      let greeting = "Good Evening";
+      if (hour < 12) greeting = "Good Morning";
+      else if (hour < 18) greeting = "Good Afternoon";
+      document.getElementById("greetingMsg").innerText = `${greeting}, ${userName}!`;
+    }
+    updateGreeting();
+
+    // Data Fetchers
+    async function fetchMentors() {
+      try {
+        const res = await fetch(`${BASE_URL}/users/mentors/all`);
+        const mentors = await res.json();
+        const box = document.getElementById("mentorsList");
+        box.innerHTML = mentors.length ? "" : `<div class="list-item mentor"><p>No mentors found.</p></div>`;
+        mentors.forEach(m => {
+          box.innerHTML += `
+            <div class="list-item mentor">
+              <p><strong>${m.name}</strong></p>
+              <span>${m.company || "Alumni"} • Rating: ${m.rating}⭐</span>
+            </div>
+          `;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function fetchMeetings() {
+      if(!userId) return;
+      try {
+        const res = await fetch(`${BASE_URL}/meetings/${userId}`);
+        const meets = await res.json();
+        const box = document.getElementById("meetingsList");
+        box.innerHTML = meets.length ? "" : `<div class="list-item"><p>No booked sessions.</p></div>`;
+        meets.forEach(m => {
+          // Displaying Alumni's exact name
+          const date = new Date(m.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short'});
+          box.innerHTML += `
+            <div class="list-item">
+              <p><strong>Meet with: ${m.alumniId? m.alumniId.name : "Mentor"}</strong></p>
+              <span>${date} • Status: ${m.status}</span>
+            </div>
+          `;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function fetchActivity() {
+      if(!userId) return;
+      try {
+        const res = await fetch(`${BASE_URL}/applications/${userId}`);
+        const apps = await res.json();
+        const box = document.getElementById("activityList");
+        box.innerHTML = apps.length ? "" : `<div class="list-item"><p>No job applications yet.</p></div>`;
+        apps.forEach(a => {
+          const date = new Date(a.createdAt).toLocaleDateString();
+          box.innerHTML += `
+            <div class="list-item">
+              <p><strong>${a.postId ? a.postId.title : "Unknown Job"}</strong></p>
+              <span>Applied: ${date} • Status: ${a.status}</span>
+            </div>
+          `;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function fetchJobs() {
+      try {
+        const res = await fetch(`${BASE_URL}/posts`);
+        const posts = await res.json();
+        const box = document.getElementById("notificationsList");
+        box.innerHTML = posts.length ? "" : `<div class="list-item"><p>No jobs found.</p></div>`;
+        posts.forEach(p => {
+          const t = p.postType === "internship" ? "Internship" : "Job";
+          box.innerHTML += `
+            <div class="list-item">
+              <p><strong>${p.title} (${t})</strong></p>
+              <span>Location: ${p.location || "N/A"}</span>
+            </div>
+          `;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function fetchDonations() {
+      try {
+        const res = await fetch(`${BASE_URL}/donations`);
+        const dons = await res.json();
+        const box = document.getElementById("fundingList");
+        box.innerHTML = dons.length ? "" : `<div class="list-item"><p>No donations yet.</p></div>`;
+        dons.forEach(d => {
+          const name = d.userId ? d.userId.name : "Anonymous";
+          const date = new Date(d.createdAt).toLocaleDateString();
+          box.innerHTML += `
+            <div class="list-item">
+               <p><strong>${name}</strong> donated $${d.amount}</p>
+               <span>Cause: ${d.cause} • ${date}</span>
+            </div>
+          `;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    // Execute
+    fetchMentors();
+    fetchMeetings();
+    fetchActivity();
+    fetchJobs();
+    fetchDonations();
+
+    // Slideshow interval
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+    if(slides.length > 0) {
+      setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
