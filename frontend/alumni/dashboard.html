@@ -328,7 +328,8 @@
     function logout() { localStorage.clear(); window.location.href = "../index.html"; }
 
     const BASE_URL = `${window.location.origin}/api`;
-    const userId = localStorage.getItem("userId") || null;
+    const userId = localStorage.getItem("userId");
+    if (!userId) { window.location.href = "../index.html"; }
 
     async function fetchAlumniCount() {
       try {
