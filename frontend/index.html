@@ -369,11 +369,21 @@
 <script>
   const BASE_URL = `${window.location.origin}/api/users`;
 
-  /* ── AUTO REDIRECT ── */
-  const storedRole = localStorage.getItem("role");
-  if (storedRole === "admin") window.location.href = "admin/dashboard.html";
-  else if (storedRole === "alumni") window.location.href = "alumni/dashboard.html";
-  else if (storedRole === "student") window.location.href = "student/dashboard.html";
+  /* ── UI STATE CHECK ── */
+  if (localStorage.getItem("userId")) {
+    const role = localStorage.getItem("role");
+    const dashLink = role === "admin" ? "admin/dashboard.html" : role === "alumni" ? "alumni/dashboard.html" : "student/dashboard.html";
+    
+    const navLogin = document.getElementById("navLoginBtn");
+    const navSignup = document.getElementById("navSignupBtn");
+    const heroLogin = document.getElementById("heroLoginBtn");
+    const heroSignup = document.getElementById("heroSignupBtn");
+
+    if(navLogin) { navLogin.innerText = "Dashboard"; navLogin.onclick = () => window.location.href = dashLink; }
+    if(navSignup) { navSignup.classList.add("hidden"); }
+    if(heroLogin) { heroLogin.innerText = "Go to Dashboard"; heroLogin.onclick = () => window.location.href = dashLink; }
+    if(heroSignup) { heroSignup.classList.add("hidden"); }
+  }
 
   /* ── TOAST ── */
   const toast = document.getElementById("toastMsg");
@@ -457,11 +467,22 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
-      const result = await res.json();
-      if (result.error) return showToast(result.error, 'error');
+      
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (err) {
+        throw new Error("Server is waking up (or offline). Please wait a minute and try again.");
+      }
+
+      if (!res.ok || result.error) return showToast(result.error || "Signup failed", 'error');
+      
       showToast(result.message || "Account created!", 'success');
       setTimeout(switchToLogin, 1100);
-    } catch { showToast("Network error. Is the backend running?", 'error'); }
+    } catch (err) { 
+      showToast(err.message || "Network error. Is the backend running?", 'error'); 
+    }
   };
 
   /* ── LOGIN ── */
@@ -476,16 +497,31 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
-      const result = await res.json();
-      if (result.error) return showToast(result.error, 'error');
+
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (err) {
+        throw new Error("Server is waking up (or offline). Please wait a minute and try again.");
+      }
+
+      if (!res.ok || result.error) return showToast(result.error || "Login failed", 'error');
+
       if (result.role) {
         showToast("Login successful! Redirecting...", 'success');
         localStorage.setItem("role", result.role);
         localStorage.setItem("name", result.name);
         localStorage.setItem("userId", result.userId);
-        setTimeout(() => window.location.href = "index.html", 1000);
+        setTimeout(() => {
+          if (result.role === "admin") window.location.href = "admin/dashboard.html";
+          else if (result.role === "alumni") window.location.href = "alumni/dashboard.html";
+          else window.location.href = "student/dashboard.html";
+        }, 1000);
       }
-    } catch { showToast("Network error. Is the backend running?", 'error'); }
+    } catch (err) { 
+      showToast(err.message || "Network error. Is the backend running?", 'error'); 
+    }
   };
 </script>
 </body>

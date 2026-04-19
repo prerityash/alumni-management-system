@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   name: String,
-  collegeId: { type: String, unique: true },
+  collegeId: { type: String, unique: true, sparse: true },
   email: { type: String, unique: true },
   password: String,
   graduationYear: Number,
