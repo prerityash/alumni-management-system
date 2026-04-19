@@ -367,7 +367,7 @@
 </div>
 
 <script>
-  const BASE_URL = "http://localhost:5000/api/users";
+  const BASE_URL = `${window.location.origin}/api/users`;
 
   /* ── AUTO REDIRECT ── */
   const storedRole = localStorage.getItem("role");
