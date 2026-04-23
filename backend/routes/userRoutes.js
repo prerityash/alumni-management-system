@@ -12,8 +12,17 @@ router.post("/register", async (req, res) => {
     console.log("BODY RECEIVED:", req.body);
     const { name, collegeId, email, password, graduationYear, role: clientRole } = req.body;
 
+    // Backend Validation
+    if (!name) return res.status(400).json({ error: "username is empty" });
+    if (!email) return res.status(400).json({ error: "email is empty" });
+    if (!password) return res.status(400).json({ error: "password is empty" });
+    if (password.length < 6) return res.status(400).json({ error: "minlength of password is 6" });
+
     // role logic
     const role = clientRole || (graduationYear < CURRENT_YEAR ? "alumni" : "student");
+
+    if (role === "student" && !collegeId) return res.status(400).json({ error: "college id is empty" });
+    if (role === "alumni" && !graduationYear) return res.status(400).json({ error: "graduation year is empty" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -37,6 +46,10 @@ router.post("/register", async (req, res) => {
 // LOGIN
 router.post("/login", async (req, res) => {
   const { loginId, password } = req.body;
+
+  // Backend Validation
+  if (!loginId) return res.status(400).json({ error: "username is empty" });
+  if (!password) return res.status(400).json({ error: "password is empty" });
 
   const user = await User.findOne({
     $or: [{ email: loginId }, { collegeId: loginId }]
