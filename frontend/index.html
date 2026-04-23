@@ -345,7 +345,7 @@
     <!-- LOGIN FORM -->
     <form id="loginForm" onsubmit="event.preventDefault(); login();">
       <input id="loginId" placeholder="College ID / Email" required>
-      <input id="loginPass" type="password" placeholder="Password" required>
+      <input id="loginPass" type="password" placeholder="Password" required minlength="6">
       <button type="submit" class="submit-btn">Access Portal</button>
     </form>
 
@@ -360,7 +360,7 @@
       <input id="email" type="email" placeholder="Email" required>
       <input id="collegeId" placeholder="College ID">
       <input id="year" type="number" placeholder="Graduation Year (e.g. 2024)" class="hidden">
-      <input id="password" type="password" placeholder="Password" minlength="6" required>
+      <input id="password" type="password" placeholder="Password" minlength="6" required minlength="6">
       <button type="submit" class="submit-btn">Create Account</button>
     </form>
   </div>
