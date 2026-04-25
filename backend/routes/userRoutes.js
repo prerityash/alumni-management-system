@@ -46,11 +46,6 @@ router.post("/register", async (req, res) => {
     if (!password) return res.status(400).json({ error: "password is empty" });
     if (password.length < 6) return res.status(400).json({ error: "minlength of password is 6" });
 
-<<<<<<< HEAD
-    // role logic
-    const role = clientRole || (graduationYear < CURRENT_YEAR ? "alumni" : "student");
-
-=======
     // Determine role
     const role = clientRole || (graduationYear < CURRENT_YEAR ? "alumni" : "student");
 
@@ -58,7 +53,6 @@ router.post("/register", async (req, res) => {
       return res.status(403).json({ error: "Cannot register as admin" });
     }
 
->>>>>>> 647fc08 (added jwt and admin page)
     if (role === "student" && !collegeId) return res.status(400).json({ error: "college id is empty" });
     if (role === "alumni" && !graduationYear) return res.status(400).json({ error: "graduation year is empty" });
 
