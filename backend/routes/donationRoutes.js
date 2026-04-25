@@ -1,10 +1,11 @@
 import express from "express";
 import Donation from "../models/Donation.js";
+import { protect, allowRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// GET all donations (sorted by newest, populated with user name)
-router.get("/", async (req, res) => {
+// GET all donations — any logged-in user can see the donation list
+router.get("/", protect, async (req, res) => {
   try {
     const donations = await Donation.find()
       .populate("userId", "name")
@@ -15,8 +16,9 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST a new donation
-router.post("/create", async (req, res) => {
+// POST a new donation — only alumni can donate
+// (Donation button is only shown on the alumni dashboard)
+router.post("/create", protect, allowRoles("alumni"), async (req, res) => {
   try {
     const { amount, cause, paymentMethod, userId } = req.body;
 
@@ -24,13 +26,7 @@ router.post("/create", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const newDonation = new Donation({
-      amount,
-      cause,
-      paymentMethod,
-      userId,
-    });
-
+    const newDonation = new Donation({ amount, cause, paymentMethod, userId });
     await newDonation.save();
     res.status(201).json({ message: "Donation successful", newDonation });
   } catch (error) {

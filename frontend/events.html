@@ -6,6 +6,7 @@
   <title>University Events | AlumniPortal Pro</title>
   <meta name="description" content="Browse and register for university events, alumni meetups, seminars, and more.">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="/assets/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -176,6 +177,56 @@
     }
     .scroll-top.visible { display: flex; }
     .scroll-top:hover { background: #6d28d9; }
+
+    /* TICKET MODAL */
+    .ticket-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000;
+      display: flex; justify-content: center; align-items: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .ticket-overlay.active { opacity: 1; pointer-events: all; }
+    .ticket-card {
+      background: #1a1a27; border-radius: 20px; width: 100%; max-width: 420px;
+      border: 1px solid #2a2a3d; overflow: hidden;
+      transform: scale(0.9) translateY(20px); transition: all 0.35s;
+    }
+    .ticket-overlay.active .ticket-card { transform: scale(1) translateY(0); }
+    .ticket-header {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      padding: 28px; text-align: center;
+    }
+    .ticket-icon { font-size: 3rem; margin-bottom: 8px; }
+    .ticket-header h2 { font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0; }
+    .ticket-header p { font-size: 0.85rem; color: rgba(255,255,255,0.75); margin-top: 4px; }
+    .ticket-body { padding: 24px; }
+    .ticket-id-box {
+      background: #111118; border: 1px dashed #7c3aed; border-radius: 12px;
+      padding: 16px; text-align: center; margin-bottom: 20px;
+    }
+    .ticket-id-label { font-size: 0.72rem; color: #8888aa; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .ticket-id-value { font-size: 1.3rem; font-weight: 800; color: #a78bfa; letter-spacing: 2px; margin-top: 4px; font-family: monospace; }
+    .ticket-details { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+    .ticket-row { display: flex; gap: 10px; align-items: flex-start; }
+    .ticket-row-icon { font-size: 1rem; margin-top: 1px; }
+    .ticket-row-info { flex: 1; }
+    .ticket-row-info label { display: block; font-size: 0.72rem; color: #8888aa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ticket-row-info p { font-size: 0.88rem; font-weight: 600; color: #f0f0ff; }
+    .ticket-close-btn {
+      width: 100%; padding: 12px; background: #7c3aed; color: white; border: none;
+      border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+      font-family: 'Outfit'; transition: background 0.2s;
+    }
+    .ticket-close-btn:hover { background: #6d28d9; }
+
+    /* TOAST */
+    .toast-msg {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(10px);
+      background: #1a1a27; border: 1px solid #7c3aed; border-radius: 10px;
+      color: #f0f0ff; padding: 10px 22px; font-size: 0.88rem; font-weight: 600;
+      opacity: 0; transition: all 0.3s; z-index: 3000; pointer-events: none; white-space: nowrap;
+    }
+    .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast-msg.error { border-color: #ef4444; }
   </style>
 </head>
 <body>
@@ -263,7 +314,46 @@
 
   <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+  <!-- TICKET CONFIRMATION MODAL -->
+  <div class="ticket-overlay" id="ticketOverlay">
+    <div class="ticket-card">
+      <div class="ticket-header">
+        <div class="ticket-icon">🎟</div>
+        <h2>You're Registered!</h2>
+        <p>Save your ticket ID to check in at the event</p>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-id-box">
+          <div class="ticket-id-label">Ticket ID</div>
+          <div class="ticket-id-value" id="tktId">TKT-2026-XXXXX</div>
+        </div>
+        <div class="ticket-details">
+          <div class="ticket-row">
+            <span class="ticket-row-icon">📌</span>
+            <div class="ticket-row-info"><label>Event</label><p id="tktEvent"></p></div>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-row-icon">📅</span>
+            <div class="ticket-row-info"><label>Date</label><p id="tktDate"></p></div>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-row-icon">📍</span>
+            <div class="ticket-row-info"><label>Location</label><p id="tktLoc"></p></div>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-row-icon">🏷</span>
+            <div class="ticket-row-info"><label>Fee</label><p id="tktFee"></p></div>
+          </div>
+        </div>
+        <button class="ticket-close-btn" onclick="closeTicket()">Done ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-msg" id="toastMsg"></div>
+
   <script>
+    const BASE_URL = `${window.location.origin}/api`;
     const userId = localStorage.getItem("userId");
     if (!userId) { window.location.href = "index.html"; }
 
@@ -274,27 +364,26 @@
       else window.location.href = "student/dashboard.html";
     }
 
-    const today = new Date();
-    function daysFromToday(d) {
-      const dt = new Date(today); dt.setDate(dt.getDate() + d); return dt.toISOString().split('T')[0];
-    }
-
-    const EVENTS = [
-      { id:1, title:"National Level Hackathon 2026", category:"Technical", date: daysFromToday(5), time:"9:00 AM – 9:00 PM", location:"Main Auditorium, LPU", seats:200, fee:"Free", reg:"Open", img:"https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=700&q=70", desc:"Join teams from across the country in a 12-hour coding challenge. Build innovative solutions for smart cities, healthcare, and sustainability. Best teams win scholarships and goodies worth ₹3 Lakh." },
-      { id:2, title:"Alumni Annual Reunion 2026", category:"Alumni", date: daysFromToday(12), time:"6:00 PM – 10:00 PM", location:"Convention Hall, Block 32", seats:500, fee:"₹500", reg:"Open", img:"https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=700&q=70", desc:"An evening of nostalgia, networking, and celebration with batchmates and faculty. Enjoy cultural performances, gala dinner, and reconnect with your roots at LPU." },
-      { id:3, title:"TechTalks: AI & Machine Learning", category:"Technical", date: daysFromToday(3), time:"11:00 AM – 1:00 PM", location:"Seminar Hall A, CSE Block", seats:150, fee:"Free", reg:"Open", img:"https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=700&q=70", desc:"Industry experts from Google and Microsoft will share insights on AI/ML trends, career pathways, and live demos of cutting-edge research. Q&A session included." },
-      { id:4, title:"Cultural Fiesta – Rangmanch 2026", category:"Cultural", date: daysFromToday(20), time:"4:00 PM – 9:00 PM", location:"Open Air Theatre", seats:1000, fee:"Free", reg:"Open", img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700&q=70", desc:"Celebrate the vibrant diversity of cultures through dance, music, drama, and art exhibitions. Representing 30+ states and 10+ countries with over 100 performances over 3 days." },
-      { id:5, title:"Startup Pitch Battle 2026", category:"Startup", date: daysFromToday(8), time:"10:00 AM – 5:00 PM", location:"Innovation Hub, Block 80", seats:300, fee:"Free", reg:"Open", img:"https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=700&q=70", desc:"Present your startup idea to a panel of 10 angel investors. Top 3 startups win seed funding up to ₹10 Lakh. Open to all students and alumni with a valid business plan." },
-      { id:6, title:"Annual Sports Meet – Sprint 2026", category:"Sports", date: daysFromToday(15), time:"8:00 AM – 6:00 PM", location:"University Sports Complex", seats:800, fee:"₹100", reg:"Open", img:"https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=700&q=70", desc:"Participate in 20+ sports disciplines including Athletics, Basketball, Swimming, Chess, and more. Win medals and trophies representing your department." },
-      { id:7, title:"Career Fair – Recruit LPU", category:"Career", date: daysFromToday(25), time:"9:00 AM – 5:00 PM", location:"Multipurpose Hall, Block 34", seats:2000, fee:"Free", reg:"Open", img:"https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=700&q=70", desc:"Meet 200+ top companies including Infosys, TCS, Wipro, Amazon, and Google. Bring your updated resume and get placed on the spot. On-site HR sessions and mock interviews." },
-      { id:8, title:"Research Symposium – InnoVate", category:"Research", date: daysFromToday(10), time:"10:00 AM – 4:00 PM", location:"Research Block, Floor 3", seats:100, fee:"Free", reg:"Open", img:"https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=700&q=70", desc:"Present your research paper and poster project to a distinguished panel. Top papers get published in university journal and 3 international journals." },
-      { id:9, title:"Web Development Bootcamp", category:"Workshop", date: daysFromToday(2), time:"9:00 AM – 5:00 PM", location:"Computer Lab 2, CSE Block", seats:60, fee:"₹200", reg:"Open", img:"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=700&q=70", desc:"2-day intensive bootcamp on React, Node.js, and MongoDB. Build a full-stack project from scratch. Get a completion certificate and course kit worth ₹1,500." },
-      { id:10, title:"Mental Health & Wellness Summit", category:"Workshop", date: daysFromToday(18), time:"2:00 PM – 5:00 PM", location:"Student Activity Center", seats:250, fee:"Free", reg:"Open", img:"https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=700&q=70", desc:"Join licensed counselors and mindfulness coaches for sessions on stress management, anxiety awareness, and building resilience. Safe space for all participants." }
-    ];
-
+    // ── All events loaded from the database ──────────────────
+    let EVENTS = []; // will be filled from API
     let activeCategory = 'all';
     let activeStatus = 'all';
     let openEventId = null;
+
+    async function loadEvents() {
+      try {
+        const res = await apiFetch(`${BASE_URL}/events`);
+        if (!res.ok) { console.error("Failed to load events"); return; }
+        const data = await res.json();
+        // Map _id to id for compatibility with the rest of the code
+        EVENTS = data.map(e => ({ ...e, id: e._id }));
+        updateStats();
+        renderEvents();
+      } catch (err) {
+        console.error("Events fetch failed:", err);
+        document.getElementById('eventsGrid').innerHTML = `<p style="color:#8888aa;text-align:center">Could not load events. Please try again.</p>`;
+      }
+    }
 
     function getStatus(event) {
       const evDate = new Date(event.date);
@@ -336,9 +425,10 @@
       grid.innerHTML = filtered.map(e => {
         const s = getStatus(e);
         const isExpired = s === 'expired';
+        const imgUrl = e.img || `https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=700&q=70`;
         return `
-          <div class="event-card" onclick="openModal(${e.id})">
-            <div class="card-img" style="background-image:url('${e.img}')">
+          <div class="event-card" onclick="openModal('${e.id}')">
+            <div class="card-img" style="background-image:url('${imgUrl}')">
               <div class="card-img-overlay"></div>
               <div class="card-badge ${badgeClass(s)}">${badgeLabel(s)}</div>
               <div class="card-category">${e.category}</div>
@@ -346,10 +436,10 @@
             <div class="card-body">
               <div class="card-title">${e.title}</div>
               <div class="card-meta">
-                <div class="card-meta-row">📅 ${formatDate(e.date)} • ${e.time}</div>
-                <div class="card-meta-row">📍 ${e.location}</div>
+                <div class="card-meta-row">📅 ${formatDate(e.date)} • ${e.time || 'TBD'}</div>
+                <div class="card-meta-row">📍 ${e.location || 'LPU Campus'}</div>
               </div>
-              <div class="card-desc">${e.desc}</div>
+              <div class="card-desc">${e.desc || ''}</div>
               <div class="card-footer">
                 <div class="card-seats">Seats: <span>${isExpired ? '0' : e.seats}</span></div>
                 <button class="details-btn ${isExpired ? 'expired' : ''}">${isExpired ? 'View Details' : 'View & Register'}</button>
@@ -360,25 +450,26 @@
     }
 
     function openModal(id) {
-      const e = EVENTS.find(x => x.id === id);
+      const e = EVENTS.find(x => x.id === id || x._id === id);
       if (!e) return;
       openEventId = id;
       const s = getStatus(e);
       const isExpired = s === 'expired';
+      const imgUrl = e.img || `https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=700&q=70`;
 
-      document.getElementById('modalImg').style.backgroundImage = `url('${e.img}')`;
+      document.getElementById('modalImg').style.backgroundImage = `url('${imgUrl}')`;
       document.getElementById('modalStatus').className = `card-badge ${badgeClass(s)}`;
       document.getElementById('modalStatus').innerText = badgeLabel(s);
       document.getElementById('modalCatBadge').innerText = e.category;
       document.getElementById('modalCat').innerText = e.category;
       document.getElementById('modalTitle').innerText = e.title;
       document.getElementById('modalDate').innerText = formatDate(e.date);
-      document.getElementById('modalTime').innerText = e.time;
-      document.getElementById('modalLoc').innerText = e.location;
+      document.getElementById('modalTime').innerText = e.time || 'TBD';
+      document.getElementById('modalLoc').innerText = e.location || 'LPU Campus';
       document.getElementById('modalSeats').innerText = isExpired ? 'Closed' : `${e.seats} seats`;
-      document.getElementById('modalReg').innerText = e.reg;
-      document.getElementById('modalFee').innerText = e.fee;
-      document.getElementById('modalDesc').innerText = e.desc;
+      document.getElementById('modalReg').innerText = e.reg || 'Open';
+      document.getElementById('modalFee').innerText = e.fee || 'Free';
+      document.getElementById('modalDesc').innerText = e.desc || '';
 
       const btn = document.getElementById('modalRegBtn');
       if (isExpired) {
@@ -405,17 +496,68 @@
       if (e.target === document.getElementById('eventModal')) closeModal();
     }
 
-    function registerEvent() {
-      const e = EVENTS.find(x => x.id === openEventId);
+    // ── REGISTER FOR EVENT via API ─────────────────────────────
+    async function registerEvent() {
+      const e = EVENTS.find(x => x.id === openEventId || x._id === openEventId);
       if (!e) return;
-      const msg = e.fee === 'Free' ? 'You have registered for free!' : `Proceed to payment of ${e.fee} to complete registration.`;
-      alert(`✅ Successfully registered for:\n"${e.title}"\n\n${msg}`);
+
+      const btn = document.getElementById('modalRegBtn');
+      btn.innerText = 'Registering...';
+      btn.disabled = true;
+
+      try {
+        const res = await apiFetch(`${BASE_URL}/registrations/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ eventId: e._id || e.id })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Registration failed', 'error');
+          btn.innerText = 'Register Now →';
+          btn.disabled = false;
+          return;
+        }
+
+        // Close event modal and show ticket
+        closeModal();
+        showTicket(data.registration, e);
+
+      } catch (err) {
+        showToast('Network error. Please try again.', 'error');
+        btn.innerText = 'Register Now →';
+        btn.disabled = false;
+      }
+    }
+
+    function showTicket(reg, event) {
+      document.getElementById('tktId').innerText    = reg.ticketId;
+      document.getElementById('tktEvent').innerText = event.title;
+      document.getElementById('tktDate').innerText  = formatDate(event.date);
+      document.getElementById('tktLoc').innerText   = event.location || 'LPU Campus';
+      document.getElementById('tktFee').innerText   = event.fee || 'Free';
+      document.getElementById('ticketOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTicket() {
+      document.getElementById('ticketOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toastMsg');
+      t.innerText = msg;
+      t.className = `toast-msg show ${type}`;
+      setTimeout(() => t.classList.remove('show'), 3500);
     }
 
     function shareEvent() {
-      const e = EVENTS.find(x => x.id === openEventId);
+      const e = EVENTS.find(x => x.id === openEventId || x._id === openEventId);
       if (!e) return;
-      alert(`Share this event:\n"${e.title}" — ${formatDate(e.date)}\n${e.location}`);
+      alert(`Share this event:\n"${e.title}" — ${formatDate(e.date)}\n${e.location || 'LPU Campus'}`);
     }
 
     function setCategory(btn, cat) {
@@ -456,8 +598,8 @@
       }, 4000);
     }
 
-    updateStats();
-    renderEvents();
+    // Load events from database on page load
+    loadEvents();
   </script>
 </body>
 </html>

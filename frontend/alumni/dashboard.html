@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alumni Dashboard — AlumniPortal Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="/assets/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -325,7 +326,11 @@
     }
     updateGreeting();
 
-    function logout() { localStorage.clear(); window.location.href = "../index.html"; }
+    async function logout() {
+      await apiFetch(`${BASE_URL}/users/logout`, { method: "POST" });
+      localStorage.clear();
+      window.location.href = "../index.html";
+    }
 
     const BASE_URL = `${window.location.origin}/api`;
     const userId = localStorage.getItem("userId");
@@ -333,7 +338,7 @@
 
     async function fetchAlumniCount() {
       try {
-        const res = await fetch(`${BASE_URL}/users/stats`);
+        const res = await apiFetch(`${BASE_URL}/users/stats`);
         const data = await res.json();
         if (data.totalAlumni !== undefined) document.getElementById('alumniCount').innerText = data.totalAlumni.toLocaleString();
       } catch (e) { console.error(e); }
@@ -341,7 +346,7 @@
 
     async function fetchDonations() {
       try {
-        const res = await fetch(`${BASE_URL}/donations`);
+        const res = await apiFetch(`${BASE_URL}/donations`);
         const donations = await res.json();
         const box = document.getElementById("fundingList");
         box.innerHTML = donations.length === 0 ? `<div class="list-item"><p>No donations yet.</p></div>` : "";
@@ -355,7 +360,7 @@
 
     async function fetchPosts() {
       try {
-        const res = await fetch(`${BASE_URL}/posts`);
+        const res = await apiFetch(`${BASE_URL}/posts`);
         const posts = await res.json();
         const box = document.getElementById("notificationsList");
         box.innerHTML = "";
@@ -379,7 +384,7 @@
         postedBy: userId
       };
       try {
-        await fetch(`${BASE_URL}/posts/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        await apiFetch(`${BASE_URL}/posts/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         alert("Job posted successfully!");
         fetchPosts();
       } catch { alert("Error posting job"); }
@@ -396,7 +401,7 @@
         postedBy: userId
       };
       try {
-        await fetch(`${BASE_URL}/posts/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        await apiFetch(`${BASE_URL}/posts/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         alert("Internship posted successfully!");
         fetchPosts();
       } catch { alert("Error posting internship"); }
@@ -410,7 +415,7 @@
         userId
       };
       try {
-        await fetch(`${BASE_URL}/donations/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        await apiFetch(`${BASE_URL}/donations/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         alert("Donation successful! Thank you!");
         document.getElementById("donAmount").value = "";
         dashboardTabBtn.click();
@@ -436,7 +441,7 @@
     // Mentor Logic
     async function initMentorSetup() {
       try {
-        const res = await fetch(`${BASE_URL}/users/${userId}`);
+        const res = await apiFetch(`${BASE_URL}/users/${userId}`);
         const user = await res.json();
         if (user.isMentorEnabled) document.getElementById('mentorEnableBtn').checked = true;
         document.getElementById('mentorDay').value = user.mentorDay || '';
@@ -458,14 +463,14 @@
         mentorLink: document.getElementById('mentorLink').value
       };
       try {
-        await fetch(`${BASE_URL}/users/${userId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        await apiFetch(`${BASE_URL}/users/${userId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         alert("Mentor configuration saved!");
       } catch { alert("Failed to save configuration!"); }
     };
 
     async function fetchMentorBookings() {
       try {
-        const res = await fetch(`${BASE_URL}/meetings/${userId}`);
+        const res = await apiFetch(`${BASE_URL}/meetings/${userId}`);
         const meetings = await res.json();
         const list = document.getElementById("mentorBookingsList");
         if (!list) return;

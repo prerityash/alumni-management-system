@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Opportunities Board — AlumniPortal Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="/assets/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -150,7 +151,7 @@
     async function applyJob(postId, link) {
       if (!window.confirm("Apply to this opportunity?")) return;
       try {
-        await fetch(`${BASE_URL}/applications/create`, {
+        await apiFetch(`${BASE_URL}/applications/create`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ studentId: userId, postId, status: 'Applied' })
         });
@@ -162,13 +163,13 @@
 
     async function expireJob(postId) {
       if (!confirm("Mark this as expired?")) return;
-      await fetch(`${BASE_URL}/posts/${postId}/expire`, { method: 'PUT' });
+      await apiFetch(`${BASE_URL}/posts/${postId}/expire`, { method: 'PUT' });
       fetchJobs();
     }
 
     async function deleteJob(postId) {
       if (!confirm("Delete this post permanently?")) return;
-      await fetch(`${BASE_URL}/posts/${postId}`, { method: 'DELETE' });
+      await apiFetch(`${BASE_URL}/posts/${postId}`, { method: 'DELETE' });
       fetchJobs();
     }
 
@@ -184,7 +185,7 @@
       container.innerHTML = "Fetching...";
       try {
         if (currentTab === 'applied') {
-          const res = await fetch(`${BASE_URL}/applications/${userId}`);
+            const res = await apiFetch(`${BASE_URL}/applications/${userId}`);
           renderApplications(await res.json());
           return;
         }
@@ -198,7 +199,7 @@
         if (exp) params.append("experience", exp);
         if (type) params.append("type", type);
         if (currentTab === 'posted') params.append("authorId", userId);
-        const res = await fetch(`${BASE_URL}/posts/search/filters?${params}`);
+        const res = await apiFetch(`${BASE_URL}/posts/search/filters?${params}`);
         renderPosts(await res.json());
       } catch (err) { console.error(err); container.innerHTML = "Failed to load."; }
     }

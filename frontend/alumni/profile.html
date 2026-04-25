@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Profile — AlumniPortal Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="/assets/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -156,7 +157,7 @@
 
     async function loadProfile() {
       try {
-        const res = await fetch(`${BASE_URL}/${userId}`);
+        const res = await apiFetch(`${BASE_URL}/${userId}`);
         const user = await res.json();
         if (user.error) { alert("Unable to fetch user details. " + user.error); return; }
         document.getElementById("profName").value = user.name || "";
@@ -190,7 +191,7 @@
         profilePic: currentProfilePic
       };
       try {
-        const res = await fetch(`${BASE_URL}/${userId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const res = await apiFetch(`${BASE_URL}/${userId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         const result = await res.json();
         if (result.error) alert("Update failed: " + result.error);
         else { alert("Profile updated successfully!"); localStorage.setItem("name", payload.name); }
