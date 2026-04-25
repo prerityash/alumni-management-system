@@ -13,7 +13,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 //
 // httpOnly: true  → JS cannot read this cookie (safe from XSS attacks)
 // sameSite: lax   → cookie is sent on normal navigation (not cross-site)
-// secure: false   → set to true in production (requires HTTPS)
+// secure: true in production (HTTPS on Render), false locally
 // maxAge: 7 days  → cookie expires in 7 days
 // ─────────────────────────────────────────────────────────────
 function sendTokenCookie(res, userId, role) {
@@ -24,10 +24,10 @@ function sendTokenCookie(res, userId, role) {
   );
 
   res.cookie("token", token, {
-    httpOnly: true,                              // cannot be accessed by JavaScript
-    sameSite: "lax",                             // safe for same-site requests
-    secure: process.env.NODE_ENV === "production", // true on Render (HTTPS), false locally
-    maxAge: 7 * 24 * 60 * 60 * 1000             // 7 days in milliseconds
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days in milliseconds
   });
 }
 
@@ -73,22 +73,12 @@ router.post("/login", async (req, res) => {
   try {
     const { loginId, password } = req.body;
 
-<<<<<<< HEAD
-  // Backend Validation
-  if (!loginId) return res.status(400).json({ error: "username is empty" });
-  if (!password) return res.status(400).json({ error: "password is empty" });
-
-  const user = await User.findOne({
-    $or: [{ email: loginId }, { collegeId: loginId }]
-  });
-=======
     // Backend Validation
     if (!loginId) return res.status(400).json({ error: "username is empty" });
     if (!password) return res.status(400).json({ error: "password is empty" });
->>>>>>> 647fc08 (added jwt and admin page)
 
     const user = await User.findOne({
-      $or: [{ email: loginId }, { collegeId: loginId }]
+      $or: [{ email: loginId }, { collegeId: loginId }, { name: loginId }]
     });
 
     if (!user) return res.status(400).json({ error: "User not found" });
@@ -96,7 +86,7 @@ router.post("/login", async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: "Invalid password" });
 
-    // ✅ Issue JWT as a cookie
+    // Issue JWT as a cookie
     sendTokenCookie(res, user._id, user.role);
 
     // Return user info for the frontend (to show name, redirect to correct dashboard)
@@ -113,7 +103,6 @@ router.post("/login", async (req, res) => {
 
 // LOGOUT — clear the cookie
 router.post("/logout", (req, res) => {
-  // Clear the cookie by setting maxAge to 0
   res.cookie("token", "", {
     httpOnly: true,
     sameSite: "lax",
@@ -180,43 +169,6 @@ router.get("/mentors/directory", protect, async (req, res) => {
   }
 });
 
-// GET USER PROFILE — any logged-in user
-router.get("/:id", protect, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) return res.status(404).json({ error: "User not found" });
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// UPDATE USER PROFILE — only the owner can update their own profile
-// RBAC check: req.user.userId (from JWT) must match req.params.id
-router.put("/:id", protect, async (req, res) => {
-  try {
-    // Security check: only allow updating your OWN profile
-    // req.user is set by the protect middleware from the JWT token
-    if (req.user.userId.toString() !== req.params.id) {
-      return res.status(403).json({ error: "You can only update your own profile." });
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true }
-    ).select("-password");
-
-    if (!updatedUser) return res.status(404).json({ error: "User not found" });
-    res.json({ message: "Profile updated successfully", user: updatedUser });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-<<<<<<< HEAD
-export default router;
-=======
 // ─────────────────────────────────────────────────────────────
 // ADMIN-ONLY ROUTES
 // ─────────────────────────────────────────────────────────────
@@ -246,5 +198,35 @@ router.delete("/admin/delete/:id", protect, allowRoles("admin"), async (req, res
   }
 });
 
+// GET USER PROFILE — any logged-in user
+router.get("/:id", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE USER PROFILE — only the owner can update their own profile
+router.put("/:id", protect, async (req, res) => {
+  try {
+    if (req.user.userId.toString() !== req.params.id) {
+      return res.status(403).json({ error: "You can only update your own profile." });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedUser) return res.status(404).json({ error: "User not found" });
+    res.json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
->>>>>>> 647fc08 (added jwt and admin page)
