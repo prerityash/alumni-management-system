@@ -24,10 +24,10 @@ function sendTokenCookie(res, userId, role) {
   );
 
   res.cookie("token", token, {
-    httpOnly: true,             // cannot be accessed by JavaScript
-    sameSite: "lax",            // safe for same-site requests
-    secure: false,              // set to true when deployed on HTTPS
-    maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days in milliseconds
+    httpOnly: true,                              // cannot be accessed by JavaScript
+    sameSite: "lax",                             // safe for same-site requests
+    secure: process.env.NODE_ENV === "production", // true on Render (HTTPS), false locally
+    maxAge: 7 * 24 * 60 * 60 * 1000             // 7 days in milliseconds
   });
 }
 
@@ -123,7 +123,7 @@ router.post("/logout", (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 0  // expire immediately
   });
   res.json({ message: "Logged out successfully" });
