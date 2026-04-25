@@ -1,172 +1,501 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alumni Dashboard — AlumniPortal Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="/assets/js/api.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body { font-family: 'Outfit', sans-serif; background: #0a0a0f; color: #f0f0ff; overflow: hidden; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #0a0a0f;
+      color: #f0f0ff;
+      overflow: hidden;
+    }
 
     /* NAVBAR */
     .navbar {
-      height: 64px; background: #111118; border-bottom: 1px solid #2a2a3d;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 32px; position: sticky; top: 0; z-index: 100;
+      height: 64px;
+      background: #111118;
+      border-bottom: 1px solid #2a2a3d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
+
     .logo {
-      font-size: 1.3rem; font-weight: 800;
+      font-size: 1.3rem;
+      font-weight: 800;
       background: linear-gradient(135deg, #a78bfa, #818cf8);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
+
     .profile-avatar {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(124, 58, 237, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .profile-avatar:hover { background: rgba(124,58,237,0.35); transform: scale(1.05); }
+
+    .profile-avatar:hover {
+      background: rgba(124, 58, 237, 0.35);
+      transform: scale(1.05);
+    }
 
     /* LAYOUT */
-    .container { display: flex; height: calc(100vh - 64px); }
+    .container {
+      display: flex;
+      height: calc(100vh - 64px);
+    }
 
     /* SIDEBAR */
     .sidebar {
-      width: 240px; background: #111118; border-right: 1px solid #2a2a3d;
-      padding: 20px 14px; display: flex; flex-direction: column; gap: 6px;
+      width: 240px;
+      background: #111118;
+      border-right: 1px solid #2a2a3d;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
+
     .sidebar button {
-      padding: 11px 16px; border: none; background: transparent; color: #8888aa;
-      font-size: 0.95rem; font-weight: 600; text-align: left; border-radius: 8px;
-      cursor: pointer; transition: all 0.25s; font-family: 'Outfit';
+      padding: 11px 16px;
+      border: none;
+      background: transparent;
+      color: #8888aa;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: left;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: 'Outfit';
     }
-    .sidebar button:hover { background: rgba(255,255,255,0.05); color: #f0f0ff; }
-    .sidebar button.active { background: rgba(124,58,237,0.2); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+
+    .sidebar button:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #f0f0ff;
+    }
+
+    .sidebar button.active {
+      background: rgba(124, 58, 237, 0.2);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, 0.3);
+    }
 
     /* CONTENT */
-    .content { flex: 1; padding: 28px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #2a2a3d transparent; }
+    .content {
+      flex: 1;
+      padding: 28px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a3d transparent;
+    }
 
     /* GREETING */
     .greeting {
-      background: #1a1a27; border: 1px solid #2a2a3d; border-radius: 14px;
-      padding: 24px 28px; margin-bottom: 24px;
-      display: flex; justify-content: space-between; align-items: center;
+      background: #1a1a27;
+      border: 1px solid #2a2a3d;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .greeting h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 4px; }
-    .greeting p, .greeting-right { color: #8888aa; font-size: 0.9rem; }
-    .greeting-right { text-align: right; line-height: 1.6; }
-    .greeting-right strong { color: #f0f0ff; }
+
+    .greeting h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .greeting p,
+    .greeting-right {
+      color: #8888aa;
+      font-size: 0.9rem;
+    }
+
+    .greeting-right {
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .greeting-right strong {
+      color: #f0f0ff;
+    }
 
     /* GRID */
-    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
-    .col-3 { grid-column: span 3; }
-    .col-4 { grid-column: span 4; }
-    .col-5 { grid-column: span 5; }
-    .col-8 { grid-column: span 8; }
-    .col-12 { grid-column: span 12; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .col-3 {
+      grid-column: span 3;
+    }
+
+    .col-4 {
+      grid-column: span 4;
+    }
+
+    .col-5 {
+      grid-column: span 5;
+    }
+
+    .col-8 {
+      grid-column: span 8;
+    }
+
+    .col-12 {
+      grid-column: span 12;
+    }
 
     /* CARD */
     .card {
-      background: #1a1a27; border: 1px solid #2a2a3d; border-radius: 14px;
-      padding: 22px; display: flex; flex-direction: column;
+      background: #1a1a27;
+      border: 1px solid #2a2a3d;
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
       transition: border-color 0.25s, box-shadow 0.25s;
     }
-    .card:hover { border-color: rgba(124,58,237,0.35); box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+
+    .card:hover {
+      border-color: rgba(124, 58, 237, 0.35);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
     .card h3 {
-      margin-bottom: 14px; font-size: 0.85rem; font-weight: 700; color: #8888aa;
-      text-transform: uppercase; letter-spacing: 0.8px;
-      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #8888aa;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     /* COUNT CARD */
-    .alumni-count-card { justify-content: center; align-items: center; text-align: center; }
-    .alumni-count-card h1 { font-size: 3.2rem; font-weight: 800; color: #a78bfa; margin: 0; }
-    .alumni-count-card p { color: #8888aa; font-size: 0.82rem; margin-top: 8px; }
+    .alumni-count-card {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .alumni-count-card h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      color: #a78bfa;
+      margin: 0;
+    }
+
+    .alumni-count-card p {
+      color: #8888aa;
+      font-size: 0.82rem;
+      margin-top: 8px;
+    }
 
     /* LIVE DOT */
-    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: blink 2s infinite; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
 
     /* LIST ITEMS */
-    .list-wrapper { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
-    .list-item {
-      background: rgba(255,255,255,0.03); border: 1px solid #2a2a3d;
-      border-left: 3px solid #7c3aed; padding: 11px 13px; border-radius: 8px;
+    .list-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
     }
-    .list-item.event { border-left-color: #f59e0b; }
-    .list-item.feedback { border-left-color: #8b5cf6; }
-    .list-item p { font-size: 0.92rem; color: #f0f0ff; margin: 0; }
-    .list-item span { font-size: 0.78rem; color: #8888aa; }
+
+    .list-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #2a2a3d;
+      border-left: 3px solid #7c3aed;
+      padding: 11px 13px;
+      border-radius: 8px;
+    }
+
+    .list-item.event {
+      border-left-color: #f59e0b;
+    }
+
+    .list-item.feedback {
+      border-left-color: #8b5cf6;
+    }
+
+    .list-item p {
+      font-size: 0.92rem;
+      color: #f0f0ff;
+      margin: 0;
+    }
+
+    .list-item span {
+      font-size: 0.78rem;
+      color: #8888aa;
+    }
 
     /* INPUTS & SELECT */
-    input, select {
-      background: #0f0f1a; border: 1px solid #2a2a3d; color: #f0f0ff;
-      padding: 10px 13px; border-radius: 8px; font-family: 'Outfit'; font-size: 0.9rem;
-      outline: none; transition: border-color 0.2s; width: 100%;
+    input,
+    select {
+      background: #0f0f1a;
+      border: 1px solid #2a2a3d;
+      color: #f0f0ff;
+      padding: 10px 13px;
+      border-radius: 8px;
+      font-family: 'Outfit';
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
     }
-    input::placeholder { color: #55556a; }
-    input:focus, select:focus { border-color: #7c3aed; background: #13131f; }
-    select option { background: #1a1a27; }
+
+    input::placeholder {
+      color: #55556a;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #7c3aed;
+      background: #13131f;
+    }
+
+    select option {
+      background: #1a1a27;
+    }
 
     /* FORM LAYOUTS */
-    .job-form-container { display: flex; gap: 14px; flex-wrap: wrap; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; }
-    .form-group label { font-size: 0.8rem; color: #8888aa; font-weight: 600; }
-    .intern-form { display: flex; flex-direction: column; gap: 12px; }
+    .job-form-container {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      color: #8888aa;
+      font-weight: 600;
+    }
+
+    .intern-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
     /* BUTTONS */
     .post-btn {
-      background: #7c3aed; color: #fff; padding: 11px 18px;
-      border: none; border-radius: 8px; font-weight: 700; cursor: pointer;
-      transition: all 0.25s; font-family: 'Outfit'; height: 42px;
-      box-shadow: 0 0 16px rgba(124,58,237,0.3);
+      background: #7c3aed;
+      color: #fff;
+      padding: 11px 18px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: 'Outfit';
+      height: 42px;
+      box-shadow: 0 0 16px rgba(124, 58, 237, 0.3);
     }
-    .post-btn:hover { background: #6d28d9; box-shadow: 0 0 24px rgba(124,58,237,0.5); transform: translateY(-1px); }
+
+    .post-btn:hover {
+      background: #6d28d9;
+      box-shadow: 0 0 24px rgba(124, 58, 237, 0.5);
+      transform: translateY(-1px);
+    }
 
     /* TOGGLE SWITCH */
-    .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #2a2a3d; transition: .4s; border-radius: 20px; }
-    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #8888aa; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background: #10b981; }
-    input:checked + .slider:before { transform: translateX(14px); background: #fff; }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #2a2a3d;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background: #8888aa;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background: #10b981;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(14px);
+      background: #fff;
+    }
 
     /* DONATION VIEW */
-    #donationView .card { max-width: 560px; margin: 20px auto; }
-    #donationView h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
-    #donationView > .card > p { color: #8888aa; font-size: 0.92rem; margin-bottom: 22px; }
-    .form-label { font-size: 0.8rem; color: #8888aa; font-weight: 600; }
+    #donationView .card {
+      max-width: 560px;
+      margin: 20px auto;
+    }
+
+    #donationView h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    #donationView>.card>p {
+      color: #8888aa;
+      font-size: 0.92rem;
+      margin-bottom: 22px;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      color: #8888aa;
+      font-weight: 600;
+    }
 
     /* UTILITY */
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
     /* SCROLLBAR */
-    .content::-webkit-scrollbar { width: 5px; }
-    .content::-webkit-scrollbar-track { background: transparent; }
-    .content::-webkit-scrollbar-thumb { background: #2a2a3d; border-radius: 3px; }
+    .content::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .content::-webkit-scrollbar-thumb {
+      background: #2a2a3d;
+      border-radius: 3px;
+    }
 
     @media (max-width: 1200px) {
-      .col-3,.col-4,.col-5,.col-8 { grid-column: span 6; }
+
+      .col-3,
+      .col-4,
+      .col-5,
+      .col-8 {
+        grid-column: span 6;
+      }
     }
+
     @media (max-width: 768px) {
-      .container { flex-direction: column; }
-      .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
-      .col-3,.col-4,.col-5,.col-8,.col-12 { grid-column: span 12; }
-      .greeting { flex-direction: column; gap: 12px; }
-      .greeting-right { text-align: left; }
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .col-3,
+      .col-4,
+      .col-5,
+      .col-8,
+      .col-12 {
+        grid-column: span 12;
+      }
+
+      .greeting {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .greeting-right {
+        text-align: left;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <!-- NAVBAR -->
   <div class="navbar">
     <div class="logo">AlumniPortal Pro</div>
     <div class="profile-avatar" onclick="window.location.href='profile.html'" title="My Profile">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
         <circle cx="12" cy="7" r="4"></circle>
       </svg>
@@ -212,7 +541,9 @@
           <div class="card col-5">
             <h3>Funding Received</h3>
             <div class="list-wrapper" id="fundingList">
-              <div class="list-item"><p>Loading donations...</p></div>
+              <div class="list-item">
+                <p>Loading donations...</p>
+              </div>
             </div>
           </div>
 
@@ -220,7 +551,9 @@
           <div class="card col-4">
             <h3>Job Notifications <span class="live-dot"></span></h3>
             <div class="list-wrapper" id="notificationsList">
-              <div class="list-item"><p>Loading...</p></div>
+              <div class="list-item">
+                <p>Loading...</p>
+              </div>
             </div>
           </div>
 
@@ -228,9 +561,12 @@
           <div class="card col-12">
             <h3>Post a New Job</h3>
             <div class="job-form-container">
-              <div class="form-group" style="flex:1 1 28%;"><label>Job Name</label><input type="text" id="jobTitle" placeholder="e.g. Senior Frontend Dev"></div>
-              <div class="form-group" style="flex:1 1 28%;"><label>Role</label><input type="text" id="jobRole" placeholder="e.g. Software Engineer"></div>
-              <div class="form-group" style="flex:1 1 28%;"><label>Experience</label><input type="text" id="jobExperience" placeholder="e.g. 2-4 Years"></div>
+              <div class="form-group" style="flex:1 1 28%;"><label>Job Name</label><input type="text" id="jobTitle"
+                  placeholder="e.g. Senior Frontend Dev"></div>
+              <div class="form-group" style="flex:1 1 28%;"><label>Role</label><input type="text" id="jobRole"
+                  placeholder="e.g. Software Engineer"></div>
+              <div class="form-group" style="flex:1 1 28%;"><label>Experience</label><input type="text"
+                  id="jobExperience" placeholder="e.g. 2-4 Years"></div>
               <div class="form-group" style="flex:1 1 18%;"><label>Type</label>
                 <select id="jobType">
                   <option value="remote">Remote</option>
@@ -238,9 +574,12 @@
                   <option value="hybrid">Hybrid</option>
                 </select>
               </div>
-              <div class="form-group" style="flex:1 1 22%;"><label>Location</label><input type="text" id="jobLocation" placeholder="e.g. New York, NY"></div>
-              <div class="form-group" style="flex:1 1 15%;"><label>Vacancy</label><input type="number" id="jobVacancy" placeholder="3"></div>
-              <div class="form-group" style="flex:1 1 30%;"><label>Register Link</label><input type="url" id="jobLink" placeholder="https://apply..."></div>
+              <div class="form-group" style="flex:1 1 22%;"><label>Location</label><input type="text" id="jobLocation"
+                  placeholder="e.g. New York, NY"></div>
+              <div class="form-group" style="flex:1 1 15%;"><label>Vacancy</label><input type="number" id="jobVacancy"
+                  placeholder="3"></div>
+              <div class="form-group" style="flex:1 1 30%;"><label>Register Link</label><input type="url" id="jobLink"
+                  placeholder="https://apply..."></div>
               <button class="post-btn" id="postJobBtn" style="margin-top:22px; flex:1 1 100%;">Post Job</button>
             </div>
           </div>
@@ -250,7 +589,10 @@
             <h3>Post Internship</h3>
             <div class="intern-form">
               <input type="text" id="internTitle" placeholder="Internship Title">
-              <select id="internType"><option value="online">Online</option><option value="offline">Offline</option></select>
+              <select id="internType">
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+              </select>
               <input type="text" id="internLocation" placeholder="Location">
               <input type="text" id="internStipend" placeholder="Stipend (e.g. $1000/mo)">
               <input type="url" id="internLink" placeholder="Application Link">
@@ -262,7 +604,9 @@
           <div class="card col-4">
             <h3>Mentorship Bookings <span class="live-dot" style="background:#8b5cf6;"></span></h3>
             <div class="list-wrapper" id="mentorBookingsList">
-              <div class="list-item feedback"><p>Loading bookings...</p></div>
+              <div class="list-item feedback">
+                <p>Loading bookings...</p>
+              </div>
             </div>
           </div>
 
@@ -284,13 +628,13 @@
         </div>
       </div><!-- /dashboardView -->
 
-      <!-- DONATION VIEW -->
       <div id="donationView" class="hidden">
         <div class="card">
           <h2>Make a Donation 💸</h2>
           <p>Support our university's growth and vision. Your contribution makes a real difference.</p>
           <div class="intern-form">
-            <div><span class="form-label">Donation Amount (USD)</span><input type="number" id="donAmount" placeholder="e.g. 500" style="margin-top:6px;"></div>
+            <div><span class="form-label">Donation Amount (INR)</span><input type="number" id="donAmount"
+                placeholder="e.g. 500" style="margin-top:6px;"></div>
             <div>
               <span class="form-label">Donation Cause</span>
               <select id="donCause" style="margin-top:6px;">
@@ -301,11 +645,9 @@
               </select>
             </div>
             <div>
-              <span class="form-label">Payment Method</span>
+              <span class="form-label">Payment Gateway</span>
               <select id="donPayment" style="margin-top:6px;">
-                <option value="Credit/Debit Card">Credit / Debit Card</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="UPI">UPI</option>
+                <option value="Razorpay">Razorpay (Cards / UPI / NetBanking)</option>
               </select>
             </div>
             <button class="post-btn" id="donateBtn" style="margin-top:10px;">Donate Now</button>
@@ -353,7 +695,7 @@
         donations.forEach(don => {
           const name = don.userId ? don.userId.name : "Anonymous";
           const date = new Date(don.createdAt).toLocaleDateString();
-          box.innerHTML += `<div class="list-item"><p><strong>${name}</strong> donated $${don.amount}</p><span>Cause: ${don.cause} · ${date}</span></div>`;
+          box.innerHTML += `<div class="list-item"><p><strong>${name}</strong> donated ₹${don.amount}</p><span>Cause: ${don.cause} · ${date}</span></div>`;
         });
       } catch (e) { console.error(e); }
     }
@@ -408,19 +750,78 @@
     };
 
     document.getElementById("donateBtn").onclick = async () => {
-      const payload = {
-        amount: Number(document.getElementById("donAmount").value),
-        cause: document.getElementById("donCause").value,
-        paymentMethod: document.getElementById("donPayment").value,
-        userId
-      };
+      const amount = Number(document.getElementById("donAmount").value);
+      const cause = document.getElementById("donCause").value;
+      const paymentMethod = document.getElementById("donPayment").value;
+
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid amount");
+        return;
+      }
+
+      const payload = { amount, cause, paymentMethod, userId };
+
       try {
-        await apiFetch(`${BASE_URL}/donations/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-        alert("Donation successful! Thank you!");
-        document.getElementById("donAmount").value = "";
-        dashboardTabBtn.click();
-        fetchDonations();
-      } catch { alert("Error making donation"); }
+        // Step 1: Create Order on Backend
+        const orderRes = await apiFetch(`${BASE_URL}/donations/create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount })
+        });
+        const orderData = await orderRes.json();
+
+        if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
+
+        // Step 2: Fetch the EXACT key from the backend
+        const keyRes = await apiFetch(`${BASE_URL}/donations/get-key`);
+        const { key } = await keyRes.json();
+
+        if (!key) throw new Error("Razorpay key not found on server");
+
+        // Step 3: Open Razorpay Checkout
+        const options = {
+          key: key, // Dynamically loaded from backend
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "AlumniPortal Pro",
+          description: "Donation for " + cause,
+          order_id: orderData.id,
+          handler: async function (response) {
+            // Step 3: On Success, Save Donation to Database
+            try {
+              const saveRes = await apiFetch(`${BASE_URL}/donations/create`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+              });
+              if (!saveRes.ok) throw new Error("Backend validation failed");
+              
+              alert("Payment successful! Thank you for your donation!");
+              document.getElementById("donAmount").value = "";
+              dashboardTabBtn.click();
+              fetchDonations();
+            } catch (err) {
+              alert("Error recording donation in database.");
+            }
+          },
+          prefill: {
+            name: localStorage.getItem("name") || "Alumni",
+            email: "alumni@example.com", // You can pass dynamic email if available
+            contact: "9999999999"
+          },
+          theme: { color: "#7c3aed" }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on("payment.failed", function (response) {
+          alert("Payment failed: " + response.error.description);
+        });
+        rzp.open();
+
+      } catch (err) {
+        console.error(err);
+        alert("Error initializing payment gateway");
+      }
     };
 
     // View Toggle
@@ -476,7 +877,7 @@
         if (!list) return;
         list.innerHTML = meetings.length === 0 ? `<div class="list-item feedback"><p>No bookings yet.</p></div>` : "";
         meetings.forEach(m => {
-          list.innerHTML += `<div class="list-item feedback"><p><strong>${m.studentId?.name || 'Student'}</strong>: ${m.topic || 'Mentorship Request'}</p><span>${new Date(m.date).toLocaleDateString()} at ${new Date(m.date).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span></div>`;
+          list.innerHTML += `<div class="list-item feedback"><p><strong>${m.studentId?.name || 'Student'}</strong>: ${m.topic || 'Mentorship Request'}</p><span>${new Date(m.date).toLocaleDateString()} at ${new Date(m.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div>`;
         });
       } catch (e) { console.error(e); }
     }
@@ -489,4 +890,5 @@
     setInterval(fetchDonations, 15000);
   </script>
 </body>
+
 </html>

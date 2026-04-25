@@ -14,7 +14,7 @@ const donationSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       required: true,
-      enum: ["Credit/Debit Card", "Bank Transfer", "UPI"],
+      enum: ["Credit/Debit Card", "Bank Transfer", "UPI", "Razorpay"],
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,

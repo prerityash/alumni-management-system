@@ -176,7 +176,7 @@
       <div class="form-group"><label>Fee</label><input id="evFee" type="text" placeholder="Free or ₹500" value="Free"></div>
       <div class="form-group"><label>Image URL (optional)</label><input id="evImg" type="url" placeholder="https://..."></div>
       <div class="form-group"><label>Description</label><textarea id="evDesc" placeholder="Brief description..."></textarea></div>
-      <button class="btn" onclick="createEvent()">Create Event</button>
+      <button class="btn" onclick="submitNewEvent()">Create Event</button>
     </div>
 
     <!-- EVENT LIST -->
@@ -280,7 +280,7 @@
     });
   }
 
-  async function createEvent() {
+  async function submitNewEvent() {
     const title = document.getElementById("evTitle").value.trim();
     const date  = document.getElementById("evDate").value;
     if (!title) return showToast("Title is required", "error");
