@@ -172,7 +172,7 @@
                 <div class="ac-badge">Class of ${user.graduationYear || "N/A"}</div>
                 <p><strong>Dept:</strong> ${user.course || "General"}</p>
                 <p><strong>At:</strong> ${user.jobPost || "Looking"} @ ${user.company || "N/A"}</p>
-                <a class="ac-btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=${user.email}" target="_blank" rel="noopener noreferrer">Contact Alumni</a>
+                <button class="ac-btn" data-email="${user.email}">Contact Alumni</button>
               </div>
             </div>`;
         });
