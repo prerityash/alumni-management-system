@@ -1,4 +1,5 @@
 import express from "express";
+import crypto from "crypto";
 import EventRegistration from "../models/EventRegistration.js";
 import Event from "../models/Event.js";
 import User from "../models/User.js";
@@ -6,12 +7,12 @@ import { protect, allowRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Helper: generate a unique ticket ID like "TKT-2026-AB3X9"
+// Helper: generate a unique ticket ID using secure UUID
 function generateTicketId() {
-  const year  = new Date().getFullYear();
-  const part1 = Math.random().toString(36).substring(2, 6).toUpperCase(); // 4 chars
-  const part2 = Math.random().toString(36).substring(2, 5).toUpperCase(); // 3 chars
-  return `TKT-${year}-${part1}${part2}`;
+  const fullId = crypto.randomUUID().toUpperCase();
+  // We'll take a 12-character segment (e.g., "B12C-9A8B") for a balance of security and readability
+  const segment = fullId.split("-")[0] + fullId.split("-")[1];
+  return `TKT-${new Date().getFullYear()}-${segment}`;
 }
 
 // ── REGISTER FOR AN EVENT ─────────────────────────────────────
