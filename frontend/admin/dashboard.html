@@ -144,6 +144,7 @@
 <nav class="tabs">
   <button class="tab-btn active" id="tabEvents" onclick="switchTab('events')">📅 Events</button>
   <button class="tab-btn" id="tabUsers"  onclick="switchTab('users')">👥 Users</button>
+  <button class="tab-btn" id="tabDonations" onclick="switchTab('donations')">💰 Donations</button>
 </nav>
 
 <!-- ══════════════════════════════════════════════ -->
@@ -217,6 +218,25 @@
 
 </section>
 
+<!-- ══════════════════════════════════════════════ -->
+<!--  TAB 3 — DONATIONS                              -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="panel" id="panelDonations">
+
+  <div class="stat-strip">
+    <div class="stat-chip"><h3 id="statTotalDonations">₹0</h3><p>Total Raised</p></div>
+    <div class="stat-chip"><h3 id="statDonationCount">0</h3><p>Total Donations</p></div>
+  </div>
+
+  <div class="card">
+    <h2>💸 Donation History</h2>
+    <div class="item-list" id="donationsList">
+      <p class="empty">Loading...</p>
+    </div>
+  </div>
+
+</section>
+
 <script>
   const BASE_URL = `${window.location.origin}/api`;
 
@@ -247,6 +267,7 @@
     document.getElementById(`tab${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
     document.getElementById(`panel${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
     if (tab === 'users' && !usersLoaded) loadUsers();
+    if (tab === 'donations' && !donationsLoaded) loadDonations();
   }
 
   // ════════════════════════════════════════════════════════════
@@ -425,6 +446,57 @@
     if (!res.ok) return showToast(result.error || "Failed", "error");
     showToast(`User "${name}" deleted`);
     loadUsers();
+  }
+
+  // ════════════════════════════════════════════════════════════
+  //  DONATIONS TAB
+  // ════════════════════════════════════════════════════════════
+
+  let donationsLoaded = false;
+  async function loadDonations() {
+    donationsLoaded = true;
+    const res = await apiFetch(`${BASE_URL}/donations`);
+    const list = document.getElementById("donationsList");
+
+    if (!res.ok) {
+      list.innerHTML = `<p class="empty">Could not load donations.</p>`;
+      return;
+    }
+
+    const donations = await res.json();
+
+    // Calculate stats
+    const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
+    document.getElementById("statTotalDonations").innerText = `₹${totalAmount.toLocaleString()}`;
+    document.getElementById("statDonationCount").innerText = donations.length;
+
+    if (!donations.length) {
+      list.innerHTML = `<p class="empty">No donations yet.</p>`;
+      return;
+    }
+
+    list.innerHTML = "";
+    donations.forEach(d => {
+      const date = new Date(d.createdAt).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      const div = document.createElement("div");
+      div.className = "item-row";
+      div.innerHTML = `
+        <div class="item-info" style="flex:1">
+          <strong>${d.userId?.name || 'Anonymous'} — ₹${d.amount.toLocaleString()}</strong>
+          <span>Cause: ${d.cause} · Method: ${d.paymentMethod} · ${date}</span>
+        </div>
+        <div class="item-actions">
+           <span class="role-badge role-alumni">${d.paymentMethod}</span>
+        </div>
+      `;
+      list.appendChild(div);
+    });
   }
 
   // ── Init ───────────────────────────────────────────────────
