@@ -153,7 +153,13 @@
   <script>
     const BASE_URL = `${window.location.origin}/api/users`;
     const userId = localStorage.getItem("userId");
-    if (!userId) window.location.href = "../index.html";
+    const userRole = localStorage.getItem("role");
+    if (!userId) {
+      window.location.href = "../index.html";
+    } else if (userRole !== "alumni") {
+      if (userRole === "admin") window.location.href = "../admin/dashboard.html";
+      else window.location.href = "../student/dashboard.html";
+    }
 
     async function loadProfile() {
       try {
