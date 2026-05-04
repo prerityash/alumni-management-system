@@ -120,7 +120,7 @@ Since the frontend uses modular JavaScript, it's recommended to serve it using a
 
 ---
 
-## 🎯 Evaluation Note (Project Submission)
+## 🎯
 This project has been meticulously crafted to fulfill all academic requirements while adhering to industry best practices:
 1. **Clean Code Architecture**: Complete separation of concerns (HTML, CSS, JS modularization).
 2. **Security**: Robust JWT authentication protecting API routes and frontend pages.
