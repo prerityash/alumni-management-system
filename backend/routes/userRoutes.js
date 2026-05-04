@@ -3,48 +3,37 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { protect, allowRoles } from "../middleware/auth.js";
+import { body, validationResult } from "express-validator";
 
 const router = express.Router();
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-// ─────────────────────────────────────────────────────────────
-// Helper: create JWT and set it as an HTTP-only cookie
-//
-// httpOnly: true  → JS cannot read this cookie (safe from XSS attacks)
-// sameSite: lax   → cookie is sent on normal navigation (not cross-site)
-// secure: true in production (HTTPS on Render), false locally
-// maxAge: 7 days  → cookie expires in 7 days
-// ─────────────────────────────────────────────────────────────
-function sendTokenCookie(res, userId, role) {
-  const token = jwt.sign(
-    { userId, role },           // payload: who the user is
-    process.env.JWT_SECRET,     // secret key from .env
-    { expiresIn: "7d" }         // token expires in 7 days
-  );
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days in milliseconds
-  });
-}
 
 // ─────────────────────────────────────────────────────────────
 // PUBLIC ROUTES (no login required)
 // ─────────────────────────────────────────────────────────────
 
 // SIGNUP — anyone can register
-router.post("/register", async (req, res) => {
+router.post("/register", [
+  body("name").notEmpty().withMessage("username is empty"),
+  body("email").notEmpty().withMessage("email is empty"),
+  // collegeId (registration no) is only required for students
+  body("collegeId")
+    .if(body("role").equals("student"))
+    .notEmpty().withMessage("registration no is empty"),
+  body("password")
+    .notEmpty().withMessage("password is empty")
+    .isLength({ min: 6 }).withMessage("minlength of password is 6")
+], async (req, res) => {
   try {
-    const { name, collegeId, email, password, graduationYear, role: clientRole } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
 
-    // Backend Validation
-    if (!name) return res.status(400).json({ error: "username is empty" });
-    if (!email) return res.status(400).json({ error: "email is empty" });
-    if (!password) return res.status(400).json({ error: "password is empty" });
-    if (password.length < 6) return res.status(400).json({ error: "minlength of password is 6" });
+    const { name, collegeId, email, password, graduationYear, role: clientRole } = req.body;
 
     // Determine role
     const role = clientRole || (graduationYear < CURRENT_YEAR ? "alumni" : "student");
@@ -53,8 +42,10 @@ router.post("/register", async (req, res) => {
       return res.status(403).json({ error: "Cannot register as admin" });
     }
 
-    if (role === "student" && !collegeId) return res.status(400).json({ error: "college id is empty" });
-    if (role === "alumni" && !graduationYear) return res.status(400).json({ error: "graduation year is empty" });
+    // Extra safety: alumni must have a graduation year
+    if (role === "alumni" && !graduationYear) {
+      return res.status(400).json({ error: "graduation year is empty" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -68,12 +59,13 @@ router.post("/register", async (req, res) => {
 });
 
 
-// LOGIN — verify password, then issue JWT cookie
+// LOGIN — verify credentials, then set a signed JWT as an HTTP-only cookie
+// HTTP-only = JS cannot read it → safe from XSS attacks
+// The browser sends it automatically on every request to this domain
 router.post("/login", async (req, res) => {
   try {
     const { loginId, password } = req.body;
 
-    // Backend Validation
     if (!loginId) return res.status(400).json({ error: "username is empty" });
     if (!password) return res.status(400).json({ error: "password is empty" });
 
@@ -86,28 +78,36 @@ router.post("/login", async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: "Invalid password" });
 
-    // Issue JWT as a cookie
-    sendTokenCookie(res, user._id, user.role);
+    // Sign the JWT
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    // Return user info for the frontend (to show name, redirect to correct dashboard)
-    res.json({
-      role: user.role,
-      name: user.name,
-      userId: user._id
+    // Store JWT in an HTTP-only cookie — JS cannot read this
+    res.cookie("token", token, {
+      httpOnly: true,                                         // not accessible via JS
+      sameSite: "lax",                                       // sent on normal navigation
+      secure: process.env.NODE_ENV === "production",          // HTTPS only in production
+      maxAge: 7 * 24 * 60 * 60 * 1000                        // 7 days in ms
     });
+
+    // Only send non-sensitive info in the response body (NOT the token)
+    res.json({ role: user.role, name: user.name, userId: user._id });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 
-// LOGOUT — clear the cookie
+// LOGOUT — clear the HTTP-only cookie
 router.post("/logout", (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 0  // expire immediately
+    maxAge: 0   // expire immediately
   });
   res.json({ message: "Logged out successfully" });
 });
